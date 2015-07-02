@@ -1,0 +1,10 @@
+31may87	0x1.0624dd2f1aap-13	R
+30lgl10	0x1.0624dd2f1aap-13	R
+19trm62	0x1.0624dd2f1aap-13	Y
+18dic99	0x1.0624dd2f1aap-13	Y
+11von54	0x1.0624dd2f1aap-13	Y
+11dec90	0x1.0624dd2f1aap-13	Y
+10feb00	0x1.0624dd2f1aap-13	R
+01sep21	0x1.0624dd2f1aap-13	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDLLLDD

@@ -1,0 +1,8 @@
+7davealbany	0x1.5d867c3ece2abp-13	R
+4directions	0x1.5d867c3ece2abp-13	Y
+2rayekorinn	0x1.5d867c3ece2abp-13	R
+1santiclows	0x1.5d867c3ece2abp-13	Y
+1lemongrass	0x1.5d867c3ece2abp-13	Y
+0qwertyuiop	0x1.5d867c3ece2abp-13	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DLLLLLLLLLL

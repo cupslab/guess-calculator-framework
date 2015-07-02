@@ -1,0 +1,11 @@
+win4me	0x1.d208a5a912e39p-14	R
+moj1to	0x1.d208a5a912e39p-14	Y
+luv2me	0x1.d208a5a912e39p-14	Y
+ilm3lg	0x1.d208a5a912e39p-14	Y
+icp0db	0x1.d208a5a912e39p-14	Y
+dec2if	0x1.d208a5a912e39p-14	Y
+chr1sc	0x1.d208a5a912e39p-14	R
+car1na	0x1.d208a5a912e39p-14	R
+bug5me	0x1.d208a5a912e39p-14	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLDLL

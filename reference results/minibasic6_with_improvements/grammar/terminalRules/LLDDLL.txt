@@ -1,0 +1,11 @@
+wi19ld	0x1.d208a5a912e39p-14	Y
+si76ni	0x1.d208a5a912e39p-14	Y
+qb04bf	0x1.d208a5a912e39p-14	Y
+kc15fl	0x1.d208a5a912e39p-14	R
+ju11an	0x1.d208a5a912e39p-14	Y
+je66nn	0x1.d208a5a912e39p-14	R
+ha78ur	0x1.d208a5a912e39p-14	Y
+ev15mh	0x1.d208a5a912e39p-14	R
+ad03nk	0x1.d208a5a912e39p-14	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLDDLL

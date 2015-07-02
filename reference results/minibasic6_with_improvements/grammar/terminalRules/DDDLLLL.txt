@@ -1,0 +1,12 @@
+631npat	0x1.a36e2eb1c4334p-14	Y
+560uwrm	0x1.a36e2eb1c4334p-14	Y
+408girl	0x1.a36e2eb1c4334p-14	R
+408clay	0x1.a36e2eb1c4334p-14	Y
+340bill	0x1.a36e2eb1c4334p-14	Y
+195oput	0x1.a36e2eb1c4334p-14	Y
+143stee	0x1.a36e2eb1c4334p-14	R
+123love	0x1.a36e2eb1c4334p-14	Y
+112iowa	0x1.a36e2eb1c4334p-14	Y
+012golf	0x1.a36e2eb1c4334p-14	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDDLLLL

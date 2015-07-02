@@ -1,0 +1,14 @@
+!@#	0x1.bd37a6f4de9bep-5	Y
+...	0x1.bd37a6f4de9bep-5	Y,R
+$$$	0x1.bd37a6f4de9bep-5	Y,R
+---	0x1.bd37a6f4de9bep-5	Y,R
+\\'	0x1.bd37a6f4de9bep-5	R
+@@@	0x1.bd37a6f4de9bep-5	Y
++++	0x1.bd37a6f4de9bep-5	Y
+***	0x1.bd37a6f4de9bep-5	Y
+)~!	0x1.bd37a6f4de9bep-5	R
+%&$	0x1.bd37a6f4de9bep-5	R
+#*^	0x1.bd37a6f4de9bep-5	Y
+###	0x1.bd37a6f4de9bep-5	Y
+
+<UNSEEN>	0x1.642c8590b2164p-2	SSS

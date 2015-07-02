@@ -1,0 +1,67 @@
+my $conditionpath = "example conditions/minibasic6";
+my $training_filter = "$conditionpath/configs/filter_basic6_train.pl";
+my $testing_filter = "$conditionpath/configs/filter_basic6_test.pl";
+my $structures_tokenizer = "./character_class_tokenizer.py";  # In root framework directory
+
+%TOP = (
+  'name' => 'minibasic6',
+  'description' => 'minibasic6 - Test a small basic6 test set with a small amount of training data',
+
+  # PCFG learning parameters
+  'tokenize_structures_method' => "$structures_tokenizer",
+
+  # Quantizer parameters
+  'totalquantlevels' => '500',
+  'quantizeriters' => '30',  # Note that this is very low and should be increased to 1000 or so for real experiments
+
+  # Evaluation control parameters
+  'cutoffmin' => '1e-12',
+  'cutoffmax' => '1e-12',
+
+  # Training data
+  'training_configuration' => {
+    'structure sources' => [
+      {
+        'name' => 'RockYou',
+        'filename' => "$conditionpath/files/RY10000.txt",
+        'filter' => "$training_filter",
+        'ID' => 'R',
+        'weight' => 100
+      },
+      {
+        'name' => 'Yahoo',
+        'filename' => "$conditionpath/files/Y10000.txt",
+        'filter' => "$training_filter",
+        'ID' => 'Y',
+        'weight' => 100
+      }
+    ],
+    'untokenized terminal sources' => [
+      {
+        # Dictionary of one million unique terms, one per line with frequency
+        'name' => 'GoogleTokens',
+        'filename' => "$conditionpath/files/minigoogle_1e6.gz",
+        'ID' => 'G',
+        'weight' => 1
+      }
+    ]
+  },
+
+  # Test data
+  'testing_configuration' => {
+    'sources' => [
+      {
+        'name' => 'RockYou100',
+        'filename' => "$conditionpath/files/RYtail_100.txt",
+        'filter' => "$testing_filter",
+        'convert_from_single_column' => 1
+      },
+      {
+        'name' => 'Yahoo100',
+        'filename' => "$conditionpath/files/Ytail_100.txt",
+        'filter' => "$testing_filter",
+        'convert_from_single_column' => 1
+      }
+    ]
+  }
+);

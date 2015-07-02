@@ -1,0 +1,24 @@
+9winchest	0x1.7d4ce4a19b174p-15	R
+9november	0x1.7d4ce4a19b174p-15	Y
+7tonyhawk	0x1.7d4ce4a19b174p-15	Y
+4metoknow	0x1.7d4ce4a19b174p-15	R
+4giraffes	0x1.7d4ce4a19b174p-15	R
+4children	0x1.7d4ce4a19b174p-15	Y
+2christie	0x1.7d4ce4a19b174p-15	R
+2bawriter	0x1.7d4ce4a19b174p-15	Y
+1solstyce	0x1.7d4ce4a19b174p-15	Y
+1samantha	0x1.7d4ce4a19b174p-15	R
+1salvador	0x1.7d4ce4a19b174p-15	R
+1provtown	0x1.7d4ce4a19b174p-15	R
+1password	0x1.7d4ce4a19b174p-15	R
+1painting	0x1.7d4ce4a19b174p-15	R
+1msbatman	0x1.7d4ce4a19b174p-15	R
+1mommykat	0x1.7d4ce4a19b174p-15	R
+1lollipop	0x1.7d4ce4a19b174p-15	R
+1lilwayne	0x1.7d4ce4a19b174p-15	Y
+1khaltura	0x1.7d4ce4a19b174p-15	Y
+1jonathan	0x1.7d4ce4a19b174p-15	R
+1computer	0x1.7d4ce4a19b174p-15	Y
+1buckeyes	0x1.7d4ce4a19b174p-15	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DLLLLLLLL

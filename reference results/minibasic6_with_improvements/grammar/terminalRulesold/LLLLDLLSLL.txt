@@ -1,0 +1,6 @@
+welc0me_rm	0x1.0624dd2f1aa00p-12	Y
+welc0me_kg	0x1.0624dd2f1aa00p-12	Y
+welc0me_dh	0x1.0624dd2f1aa00p-12	Y
+welc0me_as	0x1.0624dd2f1aa00p-12	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLLDLLSLL

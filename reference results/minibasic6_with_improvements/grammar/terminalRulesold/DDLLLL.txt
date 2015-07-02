@@ -1,0 +1,12 @@
+85baby	0x1.a36e2eb1c4334p-14	R
+69baby	0x1.a36e2eb1c4334p-14	Y
+55free	0x1.a36e2eb1c4334p-14	Y
+55beta	0x1.a36e2eb1c4334p-14	Y
+50cent	0x1.a36e2eb1c4334p-14	R
+26dogs	0x1.a36e2eb1c4334p-14	R
+17blue	0x1.a36e2eb1c4334p-14	R
+12qstp	0x1.a36e2eb1c4334p-14	Y
+10cool	0x1.a36e2eb1c4334p-14	R
+09july	0x1.a36e2eb1c4334p-14	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDLLLL

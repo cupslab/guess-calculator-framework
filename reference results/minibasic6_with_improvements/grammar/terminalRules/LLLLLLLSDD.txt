@@ -1,0 +1,8 @@
+wildcat$01	0x1.5d867c3ece2abp-13	Y
+lamanda.05	0x1.5d867c3ece2abp-13	R
+kietats_12	0x1.5d867c3ece2abp-13	R
+grandma-14	0x1.5d867c3ece2abp-13	R
+gorilla_00	0x1.5d867c3ece2abp-13	Y
+finepix_05	0x1.5d867c3ece2abp-13	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLLLLLSDD

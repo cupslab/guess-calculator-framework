@@ -1,0 +1,8 @@
+30nomokermit	0x1.5d867c3ece2abp-13	R
+13watermelon	0x1.5d867c3ece2abp-13	Y
+11thdecember	0x1.5d867c3ece2abp-13	R
+11changemypw	0x1.5d867c3ece2abp-13	Y
+11blackspeed	0x1.5d867c3ece2abp-13	Y
+00associatio	0x1.5d867c3ece2abp-13	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDLLLLLLLLLL

@@ -1,0 +1,6 @@
+r00kie	0x1.0624dd2f1aap-12	Y
+p00poo	0x1.0624dd2f1aap-12	R
+b82ina	0x1.0624dd2f1aap-12	R
+b15mut	0x1.0624dd2f1aap-12	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LDDLLL

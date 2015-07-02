@@ -1,0 +1,25 @@
+2sweet	0x1.a36e2eb1c432ep-7	R
+1faith	0x1.a36e2eb1c432ep-7	Y,R
+4ustwo	0x1.a36e2eb1c432ep-8	Y
+4given	0x1.a36e2eb1c432ep-8	R
+3urope	0x1.a36e2eb1c432ep-8	Y
+3rdeye	0x1.a36e2eb1c432ep-8	Y
+3hoops	0x1.a36e2eb1c432ep-8	Y
+2truth	0x1.a36e2eb1c432ep-8	Y
+1woody	0x1.a36e2eb1c432ep-8	Y
+1teddy	0x1.a36e2eb1c432ep-8	Y
+1tabby	0x1.a36e2eb1c432ep-8	R
+1stomp	0x1.a36e2eb1c432ep-8	R
+1stakp	0x1.a36e2eb1c432ep-8	Y
+1olani	0x1.a36e2eb1c432ep-8	Y
+1jenny	0x1.a36e2eb1c432ep-8	R
+1heart	0x1.a36e2eb1c432ep-8	R
+1gmcvb	0x1.a36e2eb1c432ep-8	R
+1elvis	0x1.a36e2eb1c432ep-8	Y
+1crazy	0x1.a36e2eb1c432ep-8	Y
+1champ	0x1.a36e2eb1c432ep-8	R
+1balla	0x1.a36e2eb1c432ep-8	R
+1babyt	0x1.a36e2eb1c432ep-8	Y
+0sumac	0x1.a36e2eb1c432ep-8	Y
+
+<UNSEEN>	0x1.ae147ae147ae1p-1	DLLLLL

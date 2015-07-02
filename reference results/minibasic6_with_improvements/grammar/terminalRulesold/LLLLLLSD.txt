@@ -1,0 +1,7 @@
+pinkis#1	0x1.a36e2eb1c4334p-13	R
+monica!1	0x1.a36e2eb1c4334p-13	R
+loganb#2	0x1.a36e2eb1c4334p-13	R
+godcan#1	0x1.a36e2eb1c4334p-13	Y
+carson#1	0x1.a36e2eb1c4334p-13	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLLLLSD

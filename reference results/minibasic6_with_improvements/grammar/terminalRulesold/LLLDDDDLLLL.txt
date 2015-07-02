@@ -1,0 +1,5 @@
+pia1369nist	0x1.5d867c3ece2abp-12	Y
+pgs5335luck	0x1.5d867c3ece2abp-12	Y
+mac1986mini	0x1.5d867c3ece2abp-12	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLDDDDLLLL

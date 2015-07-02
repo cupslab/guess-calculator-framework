@@ -1,0 +1,13 @@
+8675oksure	0x1.7d4ce4a19b174p-14	Y
+6592whitny	0x1.7d4ce4a19b174p-14	R
+2604rafael	0x1.7d4ce4a19b174p-14	R
+2000camaro	0x1.7d4ce4a19b174p-14	Y
+1992sydney	0x1.7d4ce4a19b174p-14	Y
+1991maxima	0x1.7d4ce4a19b174p-14	R
+1707dakota	0x1.7d4ce4a19b174p-14	Y
+1147godave	0x1.7d4ce4a19b174p-14	Y
+1000perros	0x1.7d4ce4a19b174p-14	R
+0521barney	0x1.7d4ce4a19b174p-14	Y
+0447knight	0x1.7d4ce4a19b174p-14	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDDDLLLLLL

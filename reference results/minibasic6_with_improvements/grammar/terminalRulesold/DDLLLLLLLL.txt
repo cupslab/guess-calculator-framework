@@ -1,0 +1,10 @@
+95shirleyj	0x1.0624dd2f1aa00p-13	Y
+90newberry	0x1.0624dd2f1aa00p-13	R
+90canisius	0x1.0624dd2f1aa00p-13	Y
+64outbreak	0x1.0624dd2f1aa00p-13	Y
+58evamarie	0x1.0624dd2f1aa00p-13	Y
+21deagosto	0x1.0624dd2f1aa00p-13	R
+21balloons	0x1.0624dd2f1aa00p-13	Y
+14kiribati	0x1.0624dd2f1aa00p-13	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDLLLLLLLL

@@ -1,0 +1,4 @@
+*tata22	0x1.0624dd2f1aap-11	R
+$game34	0x1.0624dd2f1aap-11	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	SLLLLDD

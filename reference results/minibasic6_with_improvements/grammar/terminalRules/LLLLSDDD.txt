@@ -1,0 +1,6 @@
+xmas@123	0x1.0624dd2f1aap-12	R
+test@100	0x1.0624dd2f1aap-12	Y
+pass!234	0x1.0624dd2f1aap-12	Y
+josa#968	0x1.0624dd2f1aap-12	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LLLLSDDD

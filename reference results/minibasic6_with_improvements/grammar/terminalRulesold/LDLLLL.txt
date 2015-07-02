@@ -1,0 +1,10 @@
+r0elin	0x1.0624dd2f1aa00p-13	R
+m0nkey	0x1.0624dd2f1aa00p-13	Y
+l0uise	0x1.0624dd2f1aa00p-13	Y
+h4rdyz	0x1.0624dd2f1aa00p-13	Y
+f1garo	0x1.0624dd2f1aa00p-13	Y
+c2dalo	0x1.0624dd2f1aa00p-13	R
+b4rbus	0x1.0624dd2f1aa00p-13	Y
+a3rios	0x1.0624dd2f1aa00p-13	R
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LDLLLL

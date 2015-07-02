@@ -1,0 +1,26 @@
+99maniacs	0x1.5d867c3ece2abp-15	Y
+98erpbamp	0x1.5d867c3ece2abp-15	R
+90kasindo	0x1.5d867c3ece2abp-15	Y
+88toronto	0x1.5d867c3ece2abp-15	Y
+79transam	0x1.5d867c3ece2abp-15	R
+75samurai	0x1.5d867c3ece2abp-15	Y
+74thumper	0x1.5d867c3ece2abp-15	Y
+72mormons	0x1.5d867c3ece2abp-15	Y
+66zoolane	0x1.5d867c3ece2abp-15	R
+55bebeboo	0x1.5d867c3ece2abp-15	Y
+54ttjailo	0x1.5d867c3ece2abp-15	Y
+42breborn	0x1.5d867c3ece2abp-15	Y
+28febrero	0x1.5d867c3ece2abp-15	R
+23british	0x1.5d867c3ece2abp-15	Y
+22veritas	0x1.5d867c3ece2abp-15	Y
+22forever	0x1.5d867c3ece2abp-15	Y
+18rogerrd	0x1.5d867c3ece2abp-15	Y
+15miranda	0x1.5d867c3ece2abp-15	R
+13dragons	0x1.5d867c3ece2abp-15	Y
+13dejunio	0x1.5d867c3ece2abp-15	R
+10textile	0x1.5d867c3ece2abp-15	R
+08gerrard	0x1.5d867c3ece2abp-15	R
+07gangsta	0x1.5d867c3ece2abp-15	R
+02durango	0x1.5d867c3ece2abp-15	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	DDLLLLLLL

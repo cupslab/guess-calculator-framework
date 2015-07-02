@@ -1,0 +1,4 @@
+t0rsionv3	0x1.0624dd2f1aa00p-11	R
+r0semary2	0x1.0624dd2f1aa00p-11	Y
+
+<UNSEEN>	0x1.ff7ced916872bp-1	LDLLLLLLD
