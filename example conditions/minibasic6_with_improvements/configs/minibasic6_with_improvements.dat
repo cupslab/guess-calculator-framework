@@ -10,7 +10,7 @@ my $structures_tokenizer = "./character_class_tokenizer.py";  # In root framewor
 
   # PCFG learning parameters
   'tokenize_structures_method' => "$structures_tokenizer",
-  'tokenize_structures_arguments' => '-d 1',
+  'tokenize_structures_arguments' => '-d 0.01',
   'generate_unseen_terminals' => 1,
 
   # Quantizer parameters

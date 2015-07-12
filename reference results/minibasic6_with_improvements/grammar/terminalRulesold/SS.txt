@@ -2,7 +2,7 @@
 **	0x1.54ed6e7f3d2f3p-4	Y,R
 $$	0x1.54ed6e7f3d2f3p-4	Y,R
 !@	0x1.85a1a2da8f116p-5	Y
---	0x1.24393a23eb4d0p-5	Y,R
+--	0x1.24393a23eb4d1p-5	Y,R
 ??	0x1.85a1a2da8f116p-6	R
 ..	0x1.85a1a2da8f116p-6	R
 ++	0x1.85a1a2da8f116p-6	Y,R
