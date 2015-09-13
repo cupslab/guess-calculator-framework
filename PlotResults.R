@@ -27,7 +27,7 @@
 #####
 ##### Load packages
 #####
-for (pkg in c("plyr", "stringr",  "reshape2", "ggplot2", "scales", "gridExtra",
+for (pkg in c("plyr", "stringr",  "reshape2", "ggplot2", "scales", "grid", "gridExtra",
               "survival", "plotrix", "xtable", "hash")) {
   if ((pkg %in% installed.packages()[,1])) {
     library(pkg, character.only = T)

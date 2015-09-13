@@ -422,6 +422,25 @@ You should also keep the "hybrid structures" and "unseen terminals" learning par
     Weir, M., Aggarwal, S., Medeiros, B. d., and Glodek, B. Password cracking using probabilistic context-free grammars. In Proceedings of the 2009 IEEE Symposium on Security and Privacy, IEEE (2009), 391–405.
 
 
+## 6 Emulating the guessing model from Weir 2010
+
+A simple utility is provided for emulating results from [Weir 2010] as well.  This does not use the guess calculator framework and can only be used when the desired number of guesses is small.
+
+The process starts with a single training file of source passwords.  The training set is sorted by descending frequency and deduplicated.  Guess number 1 is assigned to the most popular password, and guess numbers are assigned sequentially down this list.  The maximum guess number is the number of distinct passwords in the training set.
+
+The `simpleguess.pl` script in the `scripts/` directory facilitates this.  It is run with:
+```
+$ perl scripts/simpleguess.pl <training file> <test file>
+```
+The test file must be in plaintext format with one password per line (single-column).  The training file can be either plaintext or gzipped-wordfreq format.
+
+Stdout receives a file in [lookup result format](#lookup-result-format). Stderr receives a totalcounts file.  Using these formats means that its outputs are compatible with the plotting tools in `PlotResults.R`.  The script returns a nonzero errorlevel if unsuccessful.
+
+
+[Weir 2010]
+    Weir, M., Aggarwal, S., Collins, M., and Stern, H. Testing metrics for password creation policies by attacking large sets of revealed passwords. Proceedings of the 17th ACM Conference on Computer and Communications Security, ACM (2010), 162–175.
+
+
 ## 6 Acknowledgements
 
 Thanks to William Melicher for contributing to this section.
