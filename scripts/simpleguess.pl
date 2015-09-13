@@ -23,23 +23,22 @@ use MiscUtils;
 my $VERSION = "0.1";    # Sat Sep 12 22:19:28 2015
 
 sub usage {
-  print "simpleguess.pl <pwd source file> <test file>\n";
+  print "cat <pwd source file> | simpleguess.pl <test file>\n";
   print
-    "<pwd source file> can be in plaintext format or gzipped wordfreq format\n";
+    "<pwd source file> must be in plaintext wordfreq format\n\n";
   print
-    "<test file> must be in plaintext, one password per line\n\n";
+    "<test file> must be in plaintext, one password per line\n";
 }
 
-if (@ARGV != 2) {
+if (@ARGV != 1) {
   usage();
   die "Wrong number of arguments!";
 }
-my $source   = shift @ARGV;
 my $testfile = shift @ARGV;
 
 # Load passwords from test file into memory with frequencies
 my %testpasswords;
-open my $fh, "-|", "cat \"$testfile\"";
+open my $fh, "<", $testfile;
 while (my $line = <$fh>) {
   chomp $line;
   $testpasswords{$line} ||= 0;
@@ -48,31 +47,23 @@ while (my $line = <$fh>) {
 close($fh);
 
 # Process the source file
-my ($dir, $name, $ext) = fileparse($source, qw(.gz));
-my $cmd = "gunzip -c \"$source\"";
-# Run process_wordfreq over the file if it is not gzipped
-unless ($ext) {
-  $cmd = "./process_wordfreq.py \"$source\"";
-}
-# Replace frequencies with line numbers
-$cmd .= ' | awk \'BEGIN { OFS="\t"} { print $1 "\t" NR }\'';
-
-# Find guessnumbers for the test passwords
-open $fh, "-|", $cmd or die;
-while (my $line = <$fh>) {
+my $guessnumber = 1;
+while (my $line = <STDIN>) {
   chomp $line;
   my @fields      = split /\t/, $line;
   my $pwd         = $fields[0];
-  my $guessnumber = $fields[1];
+  # Ignore the frequency field
+
   if (exists $testpasswords{$pwd}) {
     for (my $i = 0; $i < $testpasswords{$pwd}; $i++) {
       print "nouser\tsimpleguess\t$pwd\t0x1p-1\tNA\t$guessnumber\tSG\n";
     }
     delete $testpasswords{$pwd};
   }
+
+  $guessnumber += 1;
 }
 my $totalcount = $.;
-close($fh);
 
 # Now print all the test passwords that weren't found
 while ((my $pwd, my $count) = each %testpasswords) {
