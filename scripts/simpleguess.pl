@@ -23,18 +23,22 @@ use MiscUtils;
 my $VERSION = "0.1";    # Sat Sep 12 22:19:28 2015
 
 sub usage {
-  print "cat <pwd source file> | simpleguess.pl <test file>\n";
+  print "cat <pwd source file> | simpleguess.pl <test file> [condition name]\n";
   print
     "<pwd source file> must be in plaintext wordfreq format\n\n";
   print
     "<test file> must be in plaintext, one password per line\n";
 }
 
-if (@ARGV != 1) {
+if (@ARGV < 1 || @ARGV > 3) {
   usage();
   die "Wrong number of arguments!";
 }
 my $testfile = shift @ARGV;
+my $conditionname = shift @ARGV;
+if (!$conditionname) {
+  $conditionname = "simpleguess";
+}
 
 # Load passwords from test file into memory with frequencies
 my %testpasswords;
@@ -56,7 +60,7 @@ while (my $line = <STDIN>) {
 
   if (exists $testpasswords{$pwd}) {
     for (my $i = 0; $i < $testpasswords{$pwd}; $i++) {
-      print "nouser\tsimpleguess\t$pwd\t0x1p-1\tNA\t$guessnumber\tSG\n";
+      print "nouser\t$conditionname\t$pwd\t0x1p-1\tNA\t$guessnumber\tSG\n";
     }
     delete $testpasswords{$pwd};
   }
@@ -68,7 +72,7 @@ my $totalcount = $.;
 # Now print all the test passwords that weren't found
 while ((my $pwd, my $count) = each %testpasswords) {
   for (my $i = 0; $i < $count; $i++) {
-    print "nouser\tsimpleguess\t$pwd\t0x1p-1\tNA\t-2\tSG\n";
+    print "nouser\t$conditionname\t$pwd\t0x1p-1\tNA\t-2\tSG\n";
   }
 }
 
