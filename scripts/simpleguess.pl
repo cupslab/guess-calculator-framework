@@ -23,11 +23,13 @@ use MiscUtils;
 my $VERSION = "0.1";    # Sat Sep 12 22:19:28 2015
 
 sub usage {
-  print "cat <pwd source file> | simpleguess.pl <test file> [condition name]\n";
+  print "cat <pwd source file> | simpleguess.pl <test file> [policy name]\n";
   print
-    "<pwd source file> must be in plaintext wordfreq format\n\n";
+    "<pwd source file> must be in plaintext wordfreq format\n";
   print
     "<test file> must be in plaintext, one password per line\n";
+  print
+    "[policy name] is an optional string to use in the policy name field of the lookup results\n\n";
 }
 
 if (@ARGV < 1 || @ARGV > 3) {
