@@ -430,15 +430,15 @@ The process starts with a single training file of source passwords.  The trainin
 
 The `simpleguess.pl` script in the `scripts/` directory facilitates this.  It is run with:
 ```
-$ cat <training file> | perl scripts/simpleguess.pl <test file> > lookupresults.output 2> totalcounts.output
+$ cat <training file> | perl scripts/simpleguess.pl <test file> [policy name] > lookupresults.output 2> totalcounts.output
 ```
 or
 ```
-$ ./process_wordfreq.py <training file> | perl scripts/simpleguess.pl <test file> > lookupresults.output 2> totalcounts.output
+$ ./process_wordfreq.py <training file> | perl scripts/simpleguess.pl <test file> [policy name] > lookupresults.output 2> totalcounts.output
 ```
 The test file must be in plaintext format with one password per line (single-column).  The training input must be in plaintext wordfreq format.  As shown above, you can use the `process_wordfreq.py` utility to convert your training file into this format.
 
-Stdout is sent a file in [lookup result format](#lookup-result-format). Stderr is sent a totalcounts file.  Using these formats means that its outputs are compatible with the plotting tools in `PlotResults.R`.  The script returns a nonzero errorlevel if unsuccessful.
+Stdout is sent a file in [lookup result format](#lookup-result-format).  You can modify the `policy name` field of the lookup result file with an optional second parameter. Stderr is sent a totalcounts file.  Using these formats means that its outputs are compatible with the plotting tools in `PlotResults.R`.  The script returns a nonzero errorlevel if unsuccessful.
 
 
 [Weir 2010]
