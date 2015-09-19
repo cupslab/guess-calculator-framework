@@ -1039,8 +1039,8 @@ CombineResults <- function(list.of.results.1, list.of.results.2) {
   # Make a deep copy of the first hash
   guesscutoffs <- copy(list.of.results.1$guesscutoffs)
   for (key in keys(list.of.results.2$guesscutoffs)) {
-    val1 <- guesscutoffs[[key]]
-    val2 <- list.of.results.2$guesscutoffs[[key]]
+    val1 <- unlist(guesscutoffs[[key]])[1]
+    val2 <- unlist(list.of.results.2$guesscutoffs[[key]])[1]
     if (has.key(key, guesscutoffs)) {
       guesscutoffs[[key]] <- min(val1, val2)
     } else {
