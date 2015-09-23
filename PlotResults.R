@@ -567,6 +567,19 @@ PlotGuessingCurves <- function(lookup.results,
     # Force labelsalign, otherwise the graph won't look right
     labelsalign = T
   }
+  
+  for (cond in unique(guessing.data$condition)) {
+    if (nrow(subset(guessing.data, condition == cond)) == 1) {
+      # Add another point so the step function doesn't fail
+      rowtofind <- which(guessing.data$condition == cond)
+      templaterow <- guessing.data[rowtofind,]    
+      rownames(templaterow) <- NULL
+      templaterow$guess.number = 0
+      templaterow$guesswork = 0
+      templaterow$proportion = 0
+      guessing.data[nrow(guessing.data) + 1,] <- templaterow
+    }
+  }
     
   if (!is.na(xlimits)) {
     guesscutoff <- xlimits[2]
