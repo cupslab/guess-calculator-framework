@@ -436,9 +436,13 @@ or
 ```
 $ ./process_wordfreq.py <training file> | perl scripts/simpleguess.pl <test file> [policy name] > lookupresults.output 2> totalcounts.output
 ```
-The test file must be in plaintext format with one password per line (single-column).  The training input must be in plaintext wordfreq format.  As shown above, you can use the `process_wordfreq.py` utility to convert your training file into this format.
+The test file must be in plaintext format with one password per line (single-column).  The training input must be in plaintext wordfreq format.  As shown above, you can use the `process_wordfreq.py` utility to convert your training file into this format. The `simpleguess.pl` script returns a nonzero errorlevel if unsuccessful.
 
-Stdout is sent a file in [lookup result format](#lookup-result-format).  You can modify the `policy name` field of the lookup result file with an optional second parameter. Stderr is sent a totalcounts file.  Using these formats means that its outputs are compatible with the plotting tools in `PlotResults.R`.  The script returns a nonzero errorlevel if unsuccessful.
+Stdout is sent a file in [lookup result format](#lookup-result-format).  You can modify the `policy name` field of the lookup result file with an optional second parameter. Stderr is sent a totalcounts file.  Using these formats means that its outputs are compatible with the plotting tools in `PlotResults.R`. For example, after running the above you can plot the output with:
+```
+$ Rscript PlotResults.R makeplot output.pdf
+```
+
 
 
 [Weir 2010]
