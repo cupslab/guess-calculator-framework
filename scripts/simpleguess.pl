@@ -25,7 +25,7 @@ my $VERSION = "0.1";    # Sat Sep 12 22:19:28 2015
 sub usage {
   print "cat <pwd source file> | simpleguess.pl <test file> [policy name]\n";
   print
-    "<pwd source file> must be in plaintext wordfreq format\n";
+    "<pwd source file> must be in sorted plaintext wordfreq format OR already sorted with one password per line and no tab characters in passwords\n";
   print
     "<test file> must be in plaintext, one password per line\n";
   print

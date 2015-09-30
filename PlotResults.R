@@ -607,8 +607,9 @@ PlotGuessingCurves <- function(lookup.results,
     }
     # For y-coordinate, use the plotrix::spreadout to force all labels to have
     #   a minimum distance from each other
-    maxproportion.data$LabelY = spreadout(maxproportion.data$MaxProp,
-                                          mindist = kLabelVerticalDistance)                                          
+    # Add a zero coordinate so we don't collide with the x-axis
+    maxproportion.data$LabelY = spreadout(c(0, maxproportion.data$MaxProp),
+                                          mindist = kLabelVerticalDistance)[-1]
   }
   if (is.na(ylimits)) {    
     if (labelsoncurves) {
