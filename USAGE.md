@@ -424,9 +424,9 @@ You should also keep the "hybrid structures" and "unseen terminals" learning par
 
 ## 6 Emulating the guessing model from Weir 2010
 
-A simple utility is provided for emulating results from [Weir 2010] as well.  This does not use the guess calculator framework and can only be used when the desired number of guesses is small.
+A simple utility is provided for emulating results from [Weir 2010].  This does not use the guess calculator framework and can only be used when the desired number of guesses is small.  It is a very simple method for generating a small list of guesses, and can be very effective with simple policies.
 
-The process starts with a single training file of source passwords.  The training set is sorted by descending frequency and deduplicated.  Guess number 1 is assigned to the most popular password, and guess numbers are assigned sequentially down this list.  The maximum guess number is the number of distinct passwords in the training set.
+The process starts with a single training file of source passwords, filtered to the target policy.  The training set is sorted by descending frequency and deduplicated.  Guess number 1 is assigned to the most popular password, and guess numbers are assigned sequentially down this list.  The maximum guess number is the number of distinct passwords in the training set.
 
 The `simpleguess.pl` script in the `scripts/` directory facilitates this.  It is run with:
 ```
@@ -442,13 +442,32 @@ Stdout is sent a file in [lookup result format](#lookup-result-format).  You can
 ```
 $ Rscript PlotResults.R makeplot output.pdf
 ```
-
+and the guessing curve will be labeled with the specified `policy name` if provided.
 
 
 [Weir 2010]
     Weir, M., Aggarwal, S., Collins, M., and Stern, H. Testing metrics for password creation policies by attacking large sets of revealed passwords. Proceedings of the 17th ACM Conference on Computer and Communications Security, ACM (2010), 162–175.
 
+## 7. Using Weir's original PCFG guessing model
+
+We also provide a copy of Weir's original PCFG code, posted at https://sites.google.com/site/reusablesec/Home/password-cracking-tools/probablistic_cracker 
+
+We provide some helper scripts that can be used to generate guess numbers with this guessing model.  It is slower than using the guess calculator framework to [emulate the model](/USAGE.md#5-emulating-the-guessing-model-from-weir-2009) but is wholly accurate to the original approach.
+
+The process starts with a single training file of source passwords, filtered to the target policy. The `ListGuesses.sh` helper script uses Weir's original code to train a PCFG model and generate guesses in probability order. It is run with:
+```
+cd weir2009
+bash ListGuesses.sh <training file>
+cd ..
+cat "weir2009/pcfg_output.txt" | perl scripts/simpleguess.pl <test file> [policy name] > lookupresults.output 2> totalcounts.output
+```
+See [the previous section](/USAGE.md#6-emulating-the-guessing-model-from-weir-2010) for information on the simpleguess script.  
+
+The original code will run until no more guesses can be generated.  For realistic training files, this number can easily exceed the amount of disk space on your machine.  The `killpcfg.sh` script in the `weir2009/` directory is called by the `ListGuesses.sh` script to terminate the process when a threshold amount of RAM or disk space is exceeded.  You can edit this script to vary the number of guesses that are generated.  You could also easily modify the `ListGuesses.sh` script to terminate after a given number of guesses, e.g.:
+```
+./pcfg_manager -dname0 "$FILTEREDFILE" -removeSpecial -removeDigits | head -n 1000000000000 > pcfg_output.txt &
+```
 
 ## 6 Acknowledgements
 
-Thanks to William Melicher for contributing to this section.
+Thanks to William Melicher for contributing to this document.
