@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 #
 # This script emulates the Weir 2010 approach to guessing passwords. It takes a
-# single file as a training set, sorts it by frequency if needed, and uses it to
-# generate guess numbers for the test set.  It is intended to be used on simple
-# password lists where we can grep through the file instead of binary search,
-# and small test files that can be stored in RAM. Since no new passwords are
-# generated, the maximum guess number is the number of distinct passwords in the
-# training set.
+# sorted list of passwords on STDIN,  and uses it to generate guess numbers for
+# the test set.  It is intended to be used on small test files that can be
+# stored in RAM, because the entire test file is loaded into a hash table. Since
+# no new passwords are generated, the maximum guess number is the number of
+# distinct passwords in the training set.
 #
 # The output is in lookup-result format, so that it is compatible with the
 # plotting tools in PlotResults.R
