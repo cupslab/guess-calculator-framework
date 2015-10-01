@@ -4,7 +4,7 @@ This is a copy of the "Probabilistic Password Cracker" released by Matt Weir on 
 It is reproduced here along with a small selection of other tools we developed: the `ListGuesses.sh` and `killpcfg.sh` scripts.
 We hope that these tools will make it easy to run password strength experiments using this original code.
 
-Please refer to [USAGE.md](/USAGE.md) for usage information.
+Please refer to [USAGE.md](/USAGE.md#7-using-weirs-original-pcfg-guessing-model) for usage information.
 
 This work directory includes tools provided by Matt Weir at https://sites.google.com/site/reusablesec/Home/password-cracking-tools/probablistic_cracker and published at:
 
