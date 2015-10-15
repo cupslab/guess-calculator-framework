@@ -65,23 +65,28 @@ void help() {
     "Author: Saranga Komanduri\n"
     "------------------------------------------------------------------------\n\n"
     "Usage Info:\n"
-    "./LookupGuessNumbers <options>\n"
+    "./LookupGuessNumbers <options> <optional options>\n"
     "\tOptions:\n"
     "\t-pfile <filename>: a password file in three-column, tab-separated format\n"
     "\t-lfile <filename>: a lookup table file in sorted, aggregrated-count format\n"
+    "\tOptional Options:\n"
+    "\t-gdir <directory>: a \"grammar directory\" produced by the calculator\n"
     "\n\n\n");
   return;
 }
 
 
 int main(int argc, char *argv[]) {
-  std::string structure_file = "grammar/nonterminalRules.txt";
-  std::string terminal_folder = "grammar/terminalRules/";
+  std::string default_structure_file = "grammar/nonterminalRules.txt";
+  std::string structure_file;
+  std::string default_terminal_folder = "grammar/terminalRules/";
+  std::string terminal_folder;
   std::string password_file;
   std::string lookup_file;
+  std::string grammar_dir;
 
   // Parse command-line arguments
-  if (argc < 5) {
+  if (argc != 5 && argc != 7) {
     help();
     return 0;
   }
@@ -105,6 +110,21 @@ int main(int argc, char *argv[]) {
         help();
         return 1;
       }
+    } else if (commandLineInput.find("-gdir") == 0) {
+      ++i;
+      if (i < argc) {
+        grammar_dir = argv[i];
+        if (grammar_dir.back() != '/') {
+          grammar_dir += '/';
+        }
+        structure_file = grammar_dir + "nonterminalRules.txt";
+        terminal_folder = grammar_dir + "terminalRules/";
+      }
+      else {
+        fprintf(stderr, "\nError: no directory found after --gdir option!\n");
+        help();
+        return 1;
+      }
     }
   }
   if (password_file == "" || lookup_file == "") {
@@ -112,6 +132,11 @@ int main(int argc, char *argv[]) {
     help();
     return 1;
   }
+  if (structure_file.empty())
+    structure_file = default_structure_file;
+  if (terminal_folder.empty())
+    terminal_folder = default_terminal_folder;
+
   fprintf(stderr, "\nReading password file: %s\n"
                   "Using lookup table file: %s\n"
                   "Using structure file: %s\n"
