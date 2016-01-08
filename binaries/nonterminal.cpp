@@ -82,8 +82,7 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     // special error message
     if (saved_errno == EMFILE) {
       fprintf(stderr,
-        "Error: Increase the open file limit of the OS. "
-        "Directions are in the installation instructions\n");
+        "Error: Increase the open file limit of the OS. See INSTALL.md\n");
     }
     return false;
   }
