@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-//
+// 
 // Modified: Sat Jun 21 20:38:11 2014
-//
+// 
 // See header file for additional information
 
 // Includes not covered in header file
@@ -31,7 +31,7 @@
 #include "nonterminal.h"
 
 
-// Destructor for Nonterminal -- checks whether variables were initialized
+// Destructor for Nonterminal -- checks whether variables were initialized 
 // before deleting them
 Nonterminal::~Nonterminal() {
   // Delete array of terminal groups
@@ -69,7 +69,7 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
 
   // Open the terminal file with open
   int file_handle;
-  std::string terminal_filename =
+  std::string terminal_filename = 
     terminals_folder + terminal_representation_ + ".txt";
   file_handle = open(terminal_filename.c_str(), O_RDONLY | O_NONBLOCK);
   if (file_handle < 0) {
@@ -108,9 +108,9 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
   }
 
   // Memory map the terminal data file
-  terminal_data_ =
-    static_cast<char *>(mmap(static_cast<caddr_t>(0),
-                             terminal_data_size_,
+  terminal_data_ = 
+    static_cast<char *>(mmap(static_cast<caddr_t>(0), 
+                             terminal_data_size_, 
                              PROT_READ, MAP_SHARED, file_handle, 0));
   if (static_cast<void *>(terminal_data_) == MAP_FAILED) {
     perror("Error in memory mapping terminal data file: ");
@@ -138,7 +138,7 @@ bool Nonterminal::initializeTerminalGroups() {
 
   // Get the number of terminal groups in the terminal_data
   // Set terminal_groups_size_ via a pass by reference
-  if (!grammartools::CountTerminalGroupsInText(terminal_data_,
+  if (!grammartools::CountTerminalGroupsInText(terminal_data_, 
                                                terminal_data_size_,
                                                terminal_groups_size_)) {
     fprintf(stderr,
@@ -183,7 +183,7 @@ bool Nonterminal::initializeTerminalGroups() {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         data_position - terminal_data_);
-      return false;
+      return false;          
     }
 
     // Determine if this is the last line of a group
@@ -195,15 +195,15 @@ bool Nonterminal::initializeTerminalGroups() {
         "for nonterminal represented by %s\n!",
         data_position - terminal_data_,
         representation_.c_str());
-      return false;
+      return false;      
     }
 
     // If at the end of a group, initalize a new Terminal Group, else
     // increment the current group size.
     if (is_end_of_group) {
       if (in_seen_groups)
-        terminal_groups_[current_group_number] =
-          new SeenTerminalGroup(terminal_data_, probability,
+        terminal_groups_[current_group_number] = 
+          new SeenTerminalGroup(terminal_data_, probability, 
                                 current_group_size, representation_,
                                 group_start,
                                 data_position - group_start + bytes_read);
@@ -274,7 +274,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
 
   if (inputstring_representation != representation_ ) {
     lookup_data->parse_status = kTerminalNotFound;
-    lookup_data->probability = -1;
+    lookup_data->probability = -1;    
     mpz_set_si(lookup_data->index, -1);
     return lookup_data;
   }
@@ -285,7 +285,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
   // resources.)
   std::string downcased_string;
   downcased_string.resize(inputstring.size());
-  std::transform(inputstring.begin(), inputstring.end(),
+  std::transform(inputstring.begin(), inputstring.end(), 
                  downcased_string.begin(), ::tolower);
   for (uint64_t i = 0; i < terminal_groups_size_; ++i) {
     // If index is not -1, then this terminal group can produce the input string
@@ -365,7 +365,7 @@ double Nonterminal::getProbabilityOfGroup(uint64_t group_index) const {
     exit(EXIT_FAILURE);
   }
 
-  return terminal_groups_[group_index]->getProbability();
+  return terminal_groups_[group_index]->getProbability();  
 }
 //
 void Nonterminal::countStringsOfGroup(mpz_t result, uint64_t group_index) const {
@@ -382,7 +382,7 @@ void Nonterminal::countStringsOfGroup(mpz_t result, uint64_t group_index) const 
   terminal_groups_[group_index]->countStrings(result);
 }
 //
-TerminalGroup::TerminalGroupStringIterator*
+TerminalGroup::TerminalGroupStringIterator* 
   Nonterminal::getStringIteratorForGroup(
     uint64_t group_index) const {
   if (group_index >= terminal_groups_size_) {
@@ -404,3 +404,4 @@ std::string Nonterminal::getRepresentation() const {
   std::string representation(representation_);
   return representation;
 }
+
