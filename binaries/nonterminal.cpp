@@ -22,6 +22,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <errno.h>
+
 #include "grammar_tools.h"
 #include "seen_terminal_group.h"
 #include "unseen_terminal_group.h"
@@ -71,10 +73,17 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     terminals_folder + terminal_representation_ + ".txt";
   file_handle = open(terminal_filename.c_str(), O_RDONLY | O_NONBLOCK);
   if (file_handle < 0) {
+    int saved_errno = errno;
     perror("Error opening terminal file: ");
     fprintf(stderr,
       "Terminal filename: %s\nCalled for nonterminal represented by %s\n",
       terminal_filename.c_str(), representation.c_str());
+    // Check if there error is too many open files in the process and output a
+    // special error message
+    if (saved_errno == EMFILE) {
+      fprintf(stderr,
+        "Error: Increase the open file limit of the OS. See INSTALL.md\n");
+    }
     return false;
   }
 

@@ -16,6 +16,7 @@
 // Includes not covered in header file
 #include <cstdio>
 #include <cstdlib>
+#include <errno.h>
 #include "grammar_tools.h"
 
 #include "pcfg.h"
@@ -43,9 +44,16 @@ bool PCFG::loadGrammar(
     const std::string& terminals_folder) {
   FILE *structurefile = fopen(structuresfilename.c_str(), "r");
   if (structurefile == NULL) {
+    int saved_errno = errno;
     perror("Error opening structure file: ");
     fprintf(stderr,
       "Structures filename: %s\n", structuresfilename.c_str());
+    // Check if there error is too many open files in the process and output a
+    // special error message
+    if (saved_errno == EMFILE) {
+      fprintf(stderr,
+        "Error: Increase the open file limit of the OS. See INSTALL.md\n");
+    }
     exit(EXIT_FAILURE);
   }
 
