@@ -7,9 +7,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Wed May 28 17:07:11 2014
-// 
+//
 
 #ifndef GCFMACROS_H__
 #define GCFMACROS_H__

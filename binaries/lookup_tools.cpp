@@ -1,5 +1,5 @@
 // lookup_tools.cpp - a collection of miscellaneous, low-level functions
-//   used when reading and parsing the grammar *on-disk* into higher-level 
+//   used when reading and parsing the grammar *on-disk* into higher-level
 //   objects
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri May 30 18:35:30 2014
-// 
+//
 
 
 // Includes not covered in header file
@@ -43,7 +43,7 @@ bool ReadPasswordLineFromStream(std::ifstream& passwordFile,
       ++tab_counter;
       if (tab_counter == 2)
         tab2_index = i;
-    }      
+    }
   }
 
   if (tab_counter != 2) {
@@ -59,9 +59,9 @@ bool ReadPasswordLineFromStream(std::ifstream& passwordFile,
 
 // Read and parse a line from the lookup table file, checking for proper format.
 // On failure, output the offending line to stderr.
-bool ReadLookupTableLine(FILE *fileptr, 
+bool ReadLookupTableLine(FILE *fileptr,
                          double& probability,
-                         std::string& guess_number, 
+                         std::string& guess_number,
                          std::string& pattern_string) {
   char buf[1024];
   if (fgets(buf, 1024, fileptr) != NULL) {
@@ -72,7 +72,7 @@ bool ReadLookupTableLine(FILE *fileptr,
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Read in probability as a hex float and assign to out-parameter      
+      // Read in probability as a hex float and assign to out-parameter
       probability = strtod(probability_str, NULL);
 
       // Check that probability is well-formed
@@ -87,7 +87,7 @@ bool ReadLookupTableLine(FILE *fileptr,
     if (guess_number_ptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       guess_number = guess_number_ptr;
     }
@@ -98,7 +98,7 @@ bool ReadLookupTableLine(FILE *fileptr,
     if (pattern_string_ptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       pattern_string = pattern_string_ptr;
     }
@@ -111,7 +111,7 @@ bool ReadLookupTableLine(FILE *fileptr,
 
  error:
   fprintf(stderr, "Error in line: \"%s\" in lookup table file!\n", buf);
-  return false;    
+  return false;
 }
 
 
@@ -164,7 +164,7 @@ bool RewindOneLine(FILE *lookupFile) {
     if (fseeko(lookupFile, -2, SEEK_CUR) != 0) {
       rewind(lookupFile);
       return false;
-    }    
+    }
   }
   return true;
 }
@@ -189,7 +189,7 @@ double FindLastProbability(FILE *lookupFile) {
   // The last line of the file should be a Total count line
   if (!RewindOneLine(lookupFile)) {
     perror("Error rewinding in lookup table file: ");
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
   if (fgetc(lookupFile) != 'T') {
     fprintf(stderr, "Error: Lookup table file does not seem to have a last line"
@@ -201,7 +201,7 @@ double FindLastProbability(FILE *lookupFile) {
   fseeko(lookupFile, -1, SEEK_CUR);
   if (!RewindOneLine(lookupFile)) {
     perror("Error rewinding in lookup table file: ");
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
   // Make sure this line starts with a probability
   if (fgetc(lookupFile) != '0') {
@@ -235,13 +235,13 @@ double FindLastProbability(FILE *lookupFile) {
 // Invariant: a) Probability at RewindOneLine(low) >= key
 //            b) Probability at RewindOneLine(high) <= key
 // - low = start, high = (seek to file size - 1; RewindOneLine; subtract 1)
-// - Check invariant: kUnexpectedFailure if a) not met, 
+// - Check invariant: kUnexpectedFailure if a) not met,
 //                    kBeyondCutoff if b) not met
 // while (low <= high)
 // - mid = (high - low)/2 + low
 // - midpos = RewindOneLine(mid)
 // - if ((Probability at midpos) == key)
-//   - if (midpos > 0 && 
+//   - if (midpos > 0 &&
 //         (Probability at RewindOneLine(midpos - 1) ==
 //         (Probability at midpos)
 //     - high = midpos - 1
@@ -270,8 +270,8 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
     exit(EXIT_FAILURE);
   }
   if (!RewindOneLine(lookupFile)) {
-    exit(EXIT_FAILURE);    
-  }  
+    exit(EXIT_FAILURE);
+  }
   off_t high = ftello(lookupFile) - 1;
   if (high < 0) {
     perror("Error getting position of file from ftello: ");
@@ -300,8 +300,8 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
     exit(EXIT_FAILURE);
   }
   if (!RewindOneLine(lookupFile)) {
-    exit(EXIT_FAILURE);    
-  }  
+    exit(EXIT_FAILURE);
+  }
   if (!ReadLookupTableLine(lookupFile, read_probability, guess_number, pattern_string)) {
     fprintf(stderr, "Unable to read probability from lookup table file!\n");
     exit(EXIT_FAILURE);
@@ -317,7 +317,7 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
 
     // Move to and record midpos
     if (fseeko(lookupFile, mid, SEEK_SET) != 0) {
-      fprintf(stderr, "Tried seeking to position %jd\n", 
+      fprintf(stderr, "Tried seeking to position %jd\n",
                       static_cast<intmax_t>(mid));
       perror("Error seeking to mid in lookup table file: ");
       exit(EXIT_FAILURE);
@@ -343,7 +343,7 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
         // We are searching for the case where the previous entry does not match
         // the key
         if (fseeko(lookupFile, midpos - 1, SEEK_SET) != 0) {
-          fprintf(stderr, "Tried seeking to position %jd\n", 
+          fprintf(stderr, "Tried seeking to position %jd\n",
                           static_cast<intmax_t>(midpos - 1));
           perror("Error seeking to midpos in lookup table file: ");
           exit(EXIT_FAILURE);
@@ -381,7 +381,7 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
         fgets(buf, 1024, lookupFile);  // fgets will consume a line
         low = ftello(lookupFile);
 
-      } else {      
+      } else {
         high = midpos - 1;
       }
     }
@@ -402,7 +402,7 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key) {
 // calculator framework, the guess number is one-indexed rather than zero-indexed.
 // This is because it represents a count, rather than an abstract rank or index.
 //
-LookupData *TableLookup(FILE *lookupFile, const double probability, 
+LookupData *TableLookup(FILE *lookupFile, const double probability,
                         const std::string& patternkey) {
   LookupData *lookup_data = new LookupData;
   mpz_init_set_si(lookup_data->index, -1);
@@ -422,7 +422,7 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
     return lookup_data;
   }
 
-  // Now check for the pattern key among the matching lines -- there can be 
+  // Now check for the pattern key among the matching lines -- there can be
   // multiple patterns with the same probability
   double read_probability = probability;
   std::string guess_number, pattern_string;
@@ -433,7 +433,7 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
       break;
     // else undo the fgetc and read and parse the line
     fseeko(lookupFile, -1, SEEK_CUR);
-    if (!ReadLookupTableLine(lookupFile, read_probability, 
+    if (!ReadLookupTableLine(lookupFile, read_probability,
                              guess_number, pattern_string)) {
       fprintf(stderr, "Unable to parse values from line in lookup table file!\n");
       exit(EXIT_FAILURE);

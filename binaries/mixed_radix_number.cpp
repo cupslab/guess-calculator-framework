@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu Jun  5 12:41:57 2014
-// 
+//
 // See header file for additional information
 
 // Includes not covered in header file
@@ -42,7 +42,7 @@ MixedRadixNumber* MixedRadixNumber::deepCopy() const {
   // Make new object with these radices
   MixedRadixNumber* copy = new MixedRadixNumber(copy_of_radices, size_);
   delete[] copy_of_radices;
-  
+
   // Now just need to copy positions
   for (unsigned int i = 0; i < size_; ++i) {
     copy->positions_[i].digit = positions_[i].digit;
@@ -62,7 +62,7 @@ MixedRadixNumber::~MixedRadixNumber() {
 void MixedRadixNumber::clear() {
   for (unsigned int i = 0; i < size_; ++i) {
     positions_[i].digit = 0;
-  }  
+  }
 }
 
 
@@ -71,7 +71,7 @@ void MixedRadixNumber::clear() {
 bool MixedRadixNumber::increment() {
   long int j = size_ - 1;
   // Proactively reduce values to account for overflow
-  while (j >= 0 && 
+  while (j >= 0 &&
          (positions_[j].digit >= (positions_[j].base - 1))) {
     positions_[j].digit = 0;
     --j;
@@ -120,4 +120,3 @@ bool MixedRadixNumber::setPlace(unsigned int place, uint64_t value) {
   }
   return false;
 }
-

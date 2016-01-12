@@ -9,12 +9,12 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Wed Jul 30 09:10:12 2014
-// 
+//
 
-// parse_status overrides other fields, i.e., if parse_status is a 
-// non-parseable code, such as kTerminalNotFound, ignore the index, 
+// parse_status overrides other fields, i.e., if parse_status is a
+// non-parseable code, such as kTerminalNotFound, ignore the index,
 // probability, and other fields.
 //
 

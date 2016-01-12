@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu Aug  7 12:50:12 2014
-// 
+//
 // Functions are declared within the lookuptools namespace
 
 #ifndef LOOKUP_TOOLS_H__
@@ -37,9 +37,9 @@ bool ReadPasswordLineFromStream(std::ifstream& passwordFile,
 // Check the read line for proper format.
 //
 // On failure, output the offending line to stderr and return false.
-bool ReadLookupTableLine(FILE *fileptr, 
+bool ReadLookupTableLine(FILE *fileptr,
                          double& probability,
-                         std::string& guess_number, 
+                         std::string& guess_number,
                          std::string& pattern_string);
 
 
@@ -83,7 +83,7 @@ ParseStatus BinarySearchLookupTable(FILE *lookupFile, double key);
 // calculator framework, the guess number is one-indexed rather than zero-indexed.
 // This is because it represents a count, rather than an abstract rank or index.
 //
-LookupData *TableLookup(FILE *lookupFile, const double probability, 
+LookupData *TableLookup(FILE *lookupFile, const double probability,
                         const std::string& patternkey);
 
 

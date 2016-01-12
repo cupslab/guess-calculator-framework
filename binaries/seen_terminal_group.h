@@ -1,4 +1,4 @@
-// seen_terminal_group.h - a class for handling "seen" terminal groups, 
+// seen_terminal_group.h - a class for handling "seen" terminal groups,
 //   which are built on terminals seen in the training data
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 
 // This file implements the SeenTerminalGroup class that inherits from the
 //   TerminalGroup abstract class.  It uses a memory-mapped file as a data
@@ -27,7 +27,7 @@
 
 class SeenTerminalGroup : public TerminalGroup {
 public:
-  SeenTerminalGroup(const char *const terminal_data, 
+  SeenTerminalGroup(const char *const terminal_data,
                     const double probability,
                     const mpz_t terminals_size,
                     const std::string& out_representation,

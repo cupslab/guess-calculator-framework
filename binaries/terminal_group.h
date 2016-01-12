@@ -1,4 +1,4 @@
-// terminal_group.h - an abstract base class for handling terminal groups, 
+// terminal_group.h - an abstract base class for handling terminal groups,
 //   collections of terminal strings in the guess calculator framework
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 // This file implements the TerminalGroup class as used in the restricted
 // PCFG of the guess calculator framework.  A terminal group is a
 // collection of terminals that share a probability and can all be
@@ -36,17 +36,17 @@
 
 class TerminalGroup {
 public:
-  TerminalGroup(const char *const terminal_data, 
+  TerminalGroup(const char *const terminal_data,
                 const double probability,
-                const std::string& out_representation) 
+                const std::string& out_representation)
     : terminal_data_(terminal_data),
       probability_(probability),
       out_representation_(out_representation) {}
 
   virtual ~TerminalGroup() {}
 
-  void countStrings(mpz_t result) { 
-    mpz_init_set(result, terminals_size_); 
+  void countStrings(mpz_t result) {
+    mpz_init_set(result, terminals_size_);
   }
   double getProbability() { return probability_; }
   // Return the "first" string of the terminal (used for string representation)
@@ -56,11 +56,11 @@ public:
   // Returns a LookupData struct with relevant fields set
   virtual LookupData* lookup(const std::string& terminal) const = 0;
 
-  // Return just the "index" of the given string in the terminal group (-1 if 
-  // no match).  
+  // Return just the "index" of the given string in the terminal group (-1 if
+  // no match).
   // By convention, mpz_t types are not returned, but are passed by reference.
   // See http://stackoverflow.com/a/13396028
-  virtual void indexInTerminalGroup(mpz_t result, 
+  virtual void indexInTerminalGroup(mpz_t result,
                                     const std::string& teststring) const = 0;
 
   class TerminalGroupStringIterator {
@@ -84,7 +84,7 @@ public:
 protected:
   // Currently, the only thing we care about is matching the up-casing characters
   // (represented by 'U' in out_representation_)
-  // 
+  //
   // Assumes that terminal and out_representation_ have the same size
   void matchOutRepresentation(std::string& terminal) const {
     for (unsigned int i = 0; i < terminal.size(); ++i)

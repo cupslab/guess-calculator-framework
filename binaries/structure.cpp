@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Sat May 31 15:51:48 2014
-// 
+//
 // See header file for additional information
 
 // Includes not covered in header file
@@ -29,7 +29,7 @@
 //
 // Check nonterminals_size_ in case LoadStructure was not called yet.
 Structure::~Structure() {
-  if (nonterminals_size_ > 0) 
+  if (nonterminals_size_ > 0)
     delete[] nonterminals_;
 }
 
@@ -38,7 +38,7 @@ Structure::~Structure() {
 // objects that comprise it.
 //
 // Returns true on success
-bool Structure::loadStructure(const std::string& representation, 
+bool Structure::loadStructure(const std::string& representation,
                    const double probability,
                    const std::string& source_ids,
                    NonterminalCollection* nonterminal_collection) {
@@ -61,12 +61,12 @@ bool Structure::loadStructure(const std::string& representation,
   ntcounter = 0;
   std::istringstream structurestream(representation_);
   std::string nonterminal_representation;
-  while (getline(structurestream, 
+  while (getline(structurestream,
                  nonterminal_representation,
                  kStructureBreakChar)) {
     // The nonterminal_representation is the "key" to getting the correct
     //   Nonterminal object.
-    Nonterminal *curnonterminal = 
+    Nonterminal *curnonterminal =
       nonterminal_collection->getOrCreateNonterminal(nonterminal_representation);
 
     // Die if the nonterminal could not be retrieved
@@ -74,7 +74,7 @@ bool Structure::loadStructure(const std::string& representation,
       fprintf(stderr,
         "Error calling LoadNonterminal on nonterminal \"%s\"!\n",
         nonterminal_representation.c_str());
-      return false;      
+      return false;
     }
 
     // Passed! Store this nonterminal
@@ -87,7 +87,7 @@ bool Structure::loadStructure(const std::string& representation,
     fprintf(stderr,
       "Found too few nonterminals in structure \"%s\"!\n",
       representation_.c_str());
-    return false;    
+    return false;
   }
 
   return true;
@@ -171,7 +171,7 @@ bool Structure::generatePatterns(const double cutoff) const {
 
       // Get the pattern identifier -- I use the first string that would be
       // produced by the pattern
-      std::string pattern_representation = 
+      std::string pattern_representation =
         pattern_manager->getFirstStringOfPattern();
 
       // Output to stdout
@@ -202,7 +202,7 @@ bool Structure::generatePatterns(const double cutoff) const {
 // Return true on success.
 //
 bool Structure::generateStrings(
-    const double cutoff, 
+    const double cutoff,
     const bool accurate_probabilities,
     const PCFG *const parent) const {
   // Initialize pattern manager
@@ -225,12 +225,12 @@ bool Structure::generateStrings(
       continue;
     }
 
-    std::string first_string_of_pattern = 
+    std::string first_string_of_pattern =
       pattern_manager->getCanonicalizedFirstStringOfPattern();
 
     // Iterate over all the strings that this pattern would produce using
     // TerminalGroupStringIterator objects
-    TerminalGroup::TerminalGroupStringIterator **iterators = 
+    TerminalGroup::TerminalGroupStringIterator **iterators =
       pattern_manager->getStringIterators();
 
     // Iterate until the first iterator overflows -- an overflow is indicated
@@ -262,12 +262,12 @@ bool Structure::generateStrings(
         // (this indicates that this structure was the highest probability
         // structure for this string).  We are sure that one of the string's
         // structures will print this string since it must be above the cutoff
-        // for this structure (otherwise we wouldn't be producing it), so the 
+        // for this structure (otherwise we wouldn't be producing it), so the
         // highest probability structure for this string must also have it
         // above the cutoff.
         if (total_lookup->first_string_of_pattern == first_string_of_pattern) {
           printf("%a\t%s\n", total_lookup->probability,
-                             current_string.c_str());          
+                             current_string.c_str());
         }
       } else {
         printf("%a\t%s\n", pattern_probability,
@@ -307,7 +307,7 @@ bool Structure::generateStrings(
 // PCFG used in the current guess calculator framework.
 //
 // If an \x01 character is found in the input, it is replaced with the break
-// character.  If this behavior is not desired, use the 
+// character.  If this behavior is not desired, use the
 // StripBreakCharacterFromTerminal function from grammar_tools.h.
 //
 // If, for some reason, an error occurs during conversion, this function will
@@ -359,11 +359,11 @@ std::string Structure::convertStringToStructureRepresentation(
 // slightly because we need to track where we are in the input string and in the
 // nonterminals, and make sure we have consumed all of both and never go out of
 // bounds on the input string.
-// 
+//
 // Then use a PatternManager object to perform the rest of the lookups, because
 // determining an index for the given string requires knowledge of pattern
 // compaction, which is encapsulated in the PatternManager class.  However,
-// the PatternManager doesn't know the enclosing structure source ids, 
+// the PatternManager doesn't know the enclosing structure source ids,
 // so this is folded in to the LookupData before returning.
 //
 // If the \x01 character is found in the string it is ignored as it represents
@@ -373,10 +373,10 @@ std::string Structure::convertStringToStructureRepresentation(
 //
 LookupData* Structure::lookup(const std::string& inputstring) const {
   // Remove any break characters from the input before parsing
-  std::string unbroken_input = 
+  std::string unbroken_input =
     grammartools::StripBreakCharacterFromTerminal(inputstring);
 
-  // Match the structure representation of the inputstring with the 
+  // Match the structure representation of the inputstring with the
   // representation of the nonterminals in this structure
   std::string inputstring_representation =
     convertStringToStructureRepresentation(unbroken_input);
@@ -388,7 +388,7 @@ LookupData* Structure::lookup(const std::string& inputstring) const {
   // Iterate over the nonterminals
   for (unsigned int i = 0; i < nonterminals_size_ && parseable; ++i) {
     // Check the nonterminal representation first
-    std::string nonterminal_representation = 
+    std::string nonterminal_representation =
       nonterminals_[i]->getRepresentation();
     for (unsigned int j = 0; j < nonterminal_representation.size(); ++j) {
       // Make sure we are not going past the end of the inputstring
@@ -396,7 +396,7 @@ LookupData* Structure::lookup(const std::string& inputstring) const {
         parseable = false;
         break;
       }
-      if (inputstring_representation[string_position++] != 
+      if (inputstring_representation[string_position++] !=
           nonterminal_representation[j]) {
         parseable = false;
         break;
@@ -419,11 +419,11 @@ LookupData* Structure::lookup(const std::string& inputstring) const {
     delete[] terminals;
     // Make a new lookup_data object to return
     LookupData *lookup_data = new LookupData;
-    mpz_init(lookup_data->index);    
+    mpz_init(lookup_data->index);
     lookup_data->parse_status = kStructureNotFound;
     lookup_data->probability = -1;
     mpz_set_si(lookup_data->index, -1);
-    return lookup_data;    
+    return lookup_data;
   }
 
   // Instantiate a pattern manager
@@ -441,20 +441,20 @@ LookupData* Structure::lookup(const std::string& inputstring) const {
   }
   LookupData *pattern_lookup = pattern_manager.lookupAndSetPattern(terminals);
   delete[] terminals;
-  
+
   // Check for catastrophic failure
   if (pattern_lookup->parse_status & kUnexpectedFailure) {
     fprintf(stderr,
       "Pattern manager reported unexpected failure for structure %s and "
       "inputstring %s!\n",
       representation_.c_str(), inputstring.c_str());
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
   // If inputstring was not parsed, return the struct
   if (!(pattern_lookup->parse_status & kCanParse)) {
     return pattern_lookup;
   }
-  if (!grammartools::AddSourceIDsFromString(source_ids_, 
+  if (!grammartools::AddSourceIDsFromString(source_ids_,
                                             pattern_lookup->source_ids)) {
     fprintf(stderr,
       "Unable to add source ids \"%s\" for structure %s and "
@@ -470,7 +470,7 @@ LookupData* Structure::lookup(const std::string& inputstring) const {
 // Count the number of ways the given string could be parsed by this structure
 //
 // Returns 0 if the string cannot be parsed, otherwise returns 1.
-// 
+//
 uint64_t Structure::countParses(const std::string& inputstring) const {
   LookupData *pattern_lookup = lookup(inputstring);
   // Free the index since we don't need it
@@ -481,4 +481,3 @@ uint64_t Structure::countParses(const std::string& inputstring) const {
   else
     return 0;
 }
-

@@ -1,4 +1,4 @@
-// unseen_terminal_group.h - a class for handling "unseen" terminal groups, 
+// unseen_terminal_group.h - a class for handling "unseen" terminal groups,
 //   which fill in the gap in training data that would be occupied by unseen
 //   terminals
 //
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 
 // This file implements the UnseenTerminalGroup class that inherits from the
 // TerminalGroup abstract class.  Unlike SeenTerminalGroup, this class
@@ -49,12 +49,12 @@
 
 class UnseenTerminalGroup : public TerminalGroup {
 public:
-  UnseenTerminalGroup(const char *terminal_data, 
+  UnseenTerminalGroup(const char *terminal_data,
                       const double probability,
                       const std::string& generator_mask,
-                      const std::string& out_representation,                      
+                      const std::string& out_representation,
                       const size_t terminal_data_size);
-  ~UnseenTerminalGroup() { 
+  ~UnseenTerminalGroup() {
     // Not much to do
     mpz_clear(total_terminals_);
     mpz_clear(terminals_size_);
@@ -113,10 +113,10 @@ private:
   // produced by the generator mask.  This includes those seen terminals that
   // can be generated.  In contrast, indexInTerminalGroup will subtract out
   // seen terminals from the returned index.
-  void terminalIndex(mpz_t result, 
-                     const std::string& terminal, 
+  void terminalIndex(mpz_t result,
+                     const std::string& terminal,
                      mpz_t region_end = NULL) const;
-  
+
   // Given an index in terminal space, generate a terminal
   // The result is matched to out_representation_, so if this includes
   // uppercase, canGenerateTerminal will return false if given the result.
@@ -124,7 +124,7 @@ private:
   std::string generateTerminal(mpz_t terminal_index) const;
   // Given a starting index and region size in terminal space, return a BitArray
   // with seen terminals marked.  Used in generating unseen terminals.
-  void findUnseenTerminals(mpz_t region_start, 
+  void findUnseenTerminals(mpz_t region_start,
                            unsigned long int region_size,
                            BitArray *found_terminals) const;
 

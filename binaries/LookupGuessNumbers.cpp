@@ -16,7 +16,7 @@
 // The main tools of this code are the data structures in lookup_data.h,
 // the functions in lookup_tools.*, and the lookup methods of various
 // objects in the guess calculator framework.
-// 
+//
 // The lookup algorithm is roughly as follows. For each password in the input
 // password file:
 // - Call PCFG::lookup on the password.  This will iterate over the structure
@@ -24,7 +24,7 @@
 //   - Structure::lookup breaks the password into terminals (returning if the
 //     password cannot be parsed by this structure) and calls
 //     PatternManager::lookup on the array of terminals.
-//     - PatternManager is required because the password might be part of a 
+//     - PatternManager is required because the password might be part of a
 //       permutable pattern, and the PatternManager class is the only one that
 //       can rank and unrank permutations.
 //     - PatternManager will return the "rank" of the password in its pattern,
@@ -175,8 +175,8 @@ int main(int argc, char *argv[]) {
 
     // If the password was parsed, search for it in the lookup table
     if (lookup_data->parse_status & kCanParse) {
-      LookupData *table_lookup = 
-        lookuptools::TableLookup(lookupFile, 
+      LookupData *table_lookup =
+        lookuptools::TableLookup(lookupFile,
                                  lookup_data->probability,
                                  lookup_data->first_string_of_pattern);
       if (table_lookup->parse_status & kCanParse) {
@@ -221,14 +221,14 @@ int main(int argc, char *argv[]) {
     if (lookup_data->parse_status & kCanParse) {
       mpz_get_str(final_guess_number, 10, lookup_data->index);
     } else {
-      sprintf(final_guess_number, "-%d", 
+      sprintf(final_guess_number, "-%d",
               static_cast<unsigned>(lookup_data->parse_status));
       lookup_data->first_string_of_pattern = "";
     }
 
     // Print all of the source ids that went into this guess
     std::string final_source_ids = "";
-    for (auto it = lookup_data->source_ids.begin(); 
+    for (auto it = lookup_data->source_ids.begin();
               it != lookup_data->source_ids.end();
               ++it) {
       final_source_ids.append(*it);
@@ -248,4 +248,3 @@ int main(int argc, char *argv[]) {
   fclose(lookupFile);
   return 0;
 }
-

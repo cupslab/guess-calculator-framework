@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Sat Nov 22 13:18:49 2014
-// 
+//
 
 // This class is initially planned to use a simple STL bit vector, but in
 //   future versions it should take advantage of __builtin_clz and other low
@@ -27,7 +27,7 @@
 class BitArray {
 public:
   BitArray(unsigned long int size) {
-    bitarray_ = new std::vector<bool>(size);    
+    bitarray_ = new std::vector<bool>(size);
     maxsize_ = size;
     size_ = size;
   }
@@ -39,7 +39,7 @@ public:
 
   void clear(unsigned long int size) {
     assert(size <= maxsize_);
-    bitarray_->assign(size, false); 
+    bitarray_->assign(size, false);
     size_ = size;
   }
 

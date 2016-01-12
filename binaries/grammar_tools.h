@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri May 30 18:35:30 2014
-// 
+//
 // Functions are declared within the grammar_tools namespace
 
 #ifndef GRAMMAR_TOOLS_H__
@@ -26,7 +26,7 @@ namespace grammartools {
 
 // Given a file pointer, count the number of lines (including the current line)
 // up to the next blank line.  E.g., if the current line is blank, 1 is returned.
-// 
+//
 // Note: The file pointer should return to its position before the function
 // was evaluated when the function returns.
 //
@@ -41,10 +41,10 @@ int SkipStructuresHeader(FILE *fileptr);
 
 // Read a line from the structures file and parse out the fields, which
 // are returned in the out-parameters.
-// 
+//
 // Return true on success, output the offending line to stderr on failure
 bool ReadStructureLine(FILE *fileptr,
-                       std::string& structure, 
+                       std::string& structure,
                        double& probability,
                        std::string& source_ids);
 
@@ -63,12 +63,12 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
 // out the fields that are returned in the out-parameters.
-// 
+//
 // NOTE: This function uses strtok which destroys that source buffer.
-// 
+//
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(char *source,
-                          std::string& terminal, 
+                          std::string& terminal,
                           double& probability,
                           std::string& source_ids);
 

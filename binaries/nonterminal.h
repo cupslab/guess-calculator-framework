@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 
 // This file implements the Nonterminal class as used in the restricted
 // PCFG of the guess calculator framework.  Currently, nonterminals only
@@ -97,7 +97,7 @@ private:
   std::string representation_;
   // Terminals don't use uppercase, so terminal_representation_ won't
   // contain "U" (it is replaced with "L")
-  std::string terminal_representation_;  
+  std::string terminal_representation_;
 
   // Disable copy and assignment
   DISALLOW_COPY_AND_ASSIGN(Nonterminal);

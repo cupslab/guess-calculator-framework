@@ -9,15 +9,15 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Wed May 28 17:07:11 2014
-// 
+//
 // See header file for additional information
 
 #include "nonterminal_collection.h"
 
 // Declare static class member
-std::unordered_map<std::string, Nonterminal *> 
+std::unordered_map<std::string, Nonterminal *>
   NonterminalCollection::nonterminal_collection_;
 
 // Destroy all Nonterminal objects in the collection

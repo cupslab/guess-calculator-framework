@@ -75,7 +75,7 @@ class PCFG {
   // See http://stackoverflow.com/a/13396028
   void countStrings(mpz_t result) const;
   bool generatePatterns(const double cutoff) const;
-  bool generateStrings(const double cutoff, 
+  bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false) const;
 
   // Run lookups for each structure in the grammar and return a LookupData

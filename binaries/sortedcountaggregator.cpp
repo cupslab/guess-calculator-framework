@@ -80,6 +80,6 @@ int main(int argc, char *argv[]) {
   mpz_sub_ui(acc, acc, 1);  // Adjust total count by 1 because acc is actually the index of the next guess, but there is no next guess at the end of the file
   mpz_get_str(accstring, 10, acc);
   printf("Total count\t%s\n", accstring);
-  
+
   exit(0);
 }

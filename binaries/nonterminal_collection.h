@@ -19,7 +19,7 @@
 // nonterminal multiple times for each different strucure that it appears in.
 // By the rules of a context-free grammar, a given nonterminal can be used with
 // the same production rules regardless of its context, which would be given by
-// the structure it belongs to. 
+// the structure it belongs to.
 //
 
 

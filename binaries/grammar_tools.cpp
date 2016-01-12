@@ -1,5 +1,5 @@
 // grammar_tools.cpp - a collection of miscellaneous, low-level functions
-//   used when reading and parsing the grammar *on-disk* into higher-level 
+//   used when reading and parsing the grammar *on-disk* into higher-level
 //   objects
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri May 30 18:35:30 2014
-// 
+//
 
 
 // Includes not covered in header file
@@ -68,8 +68,8 @@ int SkipStructuresHeader(FILE *fileptr) {
 
 // Read and parse a line from the structures file, checking for proper format.
 // On failure, output the offending line to stderr.
-bool ReadStructureLine(FILE *fileptr, 
-                       std::string& structure, 
+bool ReadStructureLine(FILE *fileptr,
+                       std::string& structure,
                        double& probability,
                        std::string& source_ids) {
   char buf[1024];
@@ -81,7 +81,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (structureptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       structure = structureptr;
     }
@@ -92,7 +92,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Read in probability as a hex float and assign to out-parameter      
+      // Read in probability as a hex float and assign to out-parameter
       probability = strtod(probability_str, NULL);
 
       // Check that probability is well-formed
@@ -107,7 +107,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (sourceidsptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       source_ids = sourceidsptr;
     }
@@ -120,7 +120,7 @@ bool ReadStructureLine(FILE *fileptr,
 
  error:
   fprintf(stderr, "Error in line: \"%s\" in structures file!\n", buf);
-  return false;    
+  return false;
 }
 
 // Simple function to remove the \x01 character from the input string and
@@ -153,9 +153,9 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     bytes_to_read = source_length;
     end_of_string = true;
   }
-  
+
   // "Read" the characters by copying them into destination and check for errors
-  char *temp_position = 
+  char *temp_position =
     static_cast<char *> (memccpy(destination, source, '\n', bytes_to_read));
 
   // Allow that the source might not end in a newline only if we consume the
@@ -164,7 +164,7 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     fprintf(stderr,
       "Newline character not found with read where source_length was %zu\n",
       source_length);
-    return false;    
+    return false;
   }
 
   // memccpy returns a pointer to just past the newline in destination unless
@@ -183,12 +183,12 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
 // out the fields that are returned in the out-parameters.
-// 
+//
 // NOTE: This function uses strtok which destroys that source buffer.
-// 
+//
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(char *source,
-                          std::string& terminal, 
+                          std::string& terminal,
                           double& probability,
                           std::string& source_ids) {
   // Tokenize the buffer using strtok
@@ -196,9 +196,9 @@ bool ParseNonterminalLine(char *source,
   terminalptr = strtok(source, "\t");
   if (terminalptr == NULL) {
     fprintf(stderr, "Terminal field not found!\n");
-    return false;          
+    return false;
   }
-  // Copy the c-string to the out-parameter using the 
+  // Copy the c-string to the out-parameter using the
   // std::string assignment operator
   terminal = terminalptr;
 
@@ -206,14 +206,14 @@ bool ParseNonterminalLine(char *source,
   probability_str = strtok(NULL, "\t");
   if (probability_str == NULL) {
     fprintf(stderr, "Probability field not found!\n");
-    return false;          
+    return false;
   }
-  // Read in probability as a hex float and assign to out-parameter      
+  // Read in probability as a hex float and assign to out-parameter
   probability = strtod(probability_str, NULL);
   // Check that probability is well-formed
   if (probability <= 0.0 || probability > 1.0) {
     fprintf(stderr, "Probability field not parsed correctly!\n");
-    return false;                
+    return false;
   }
 
   // The remainder of the line will be source ids
@@ -222,7 +222,7 @@ bool ParseNonterminalLine(char *source,
   if (sourceidsptr == NULL) {
     fprintf(stderr,
       "Source IDs field not found!\n");
-    return false;          
+    return false;
   }
   source_ids = sourceidsptr;
 
@@ -272,7 +272,7 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         current_position - source);
-      return false;          
+      return false;
     }
 
     // Check for a change in probability
@@ -343,7 +343,7 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   double current_probability, next_probability;
   if (!ParseNonterminalLine(read_buffer, terminal,
                             current_probability, source_ids)) {
-    return false;         
+    return false;
   }
   if (!ParseNonterminalLine(peek_buffer, terminal,
                             next_probability, source_ids)) {

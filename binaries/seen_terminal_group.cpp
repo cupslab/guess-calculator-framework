@@ -1,4 +1,4 @@
-// seen_terminal_group.cpp - a class for handling "seen" terminal groups, 
+// seen_terminal_group.cpp - a class for handling "seen" terminal groups,
 //   which are built on terminals seen in the training data
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 // See header file for additional information
 
 // Includes not covered in header file
@@ -34,7 +34,7 @@ void SeenTerminalGroup::loadFirstString() {
                                            read_buffer, bytes_read)) {
     fprintf(stderr, "Failed read in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
-  }    
+  }
 
   std::string terminal, source_ids;
   double probability;
@@ -43,7 +43,7 @@ void SeenTerminalGroup::loadFirstString() {
     fprintf(stderr,
       "Line could not be parsed in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
-  }    
+  }
 
   // terminal is the first string in the terminal data, modify it to match
   // the out_representation_
@@ -56,7 +56,7 @@ void SeenTerminalGroup::loadFirstString() {
       "SeenTerminalGroup::loadFirstString!\n"
       "out_representation_: %s\nterminal: %s\n",
       out_representation_.c_str(), terminal.c_str());
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
 
   // Check if modifications are needed and record
@@ -121,7 +121,7 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
       }
       lookup_data->probability = probability_;
       // index is already set correctly
-      if (!grammartools::AddSourceIDsFromString(source_ids, 
+      if (!grammartools::AddSourceIDsFromString(source_ids,
                                                 lookup_data->source_ids)) {
         fprintf(stderr,
           "Could not parse source ids %s in line %s in "
@@ -151,7 +151,7 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
 //
 // This function simply calls lookup, and then returns just the index
 //
-void SeenTerminalGroup::indexInTerminalGroup(mpz_t result, 
+void SeenTerminalGroup::indexInTerminalGroup(mpz_t result,
                                              const std::string& teststring) const {
   LookupData *lookup_data = lookup(teststring);
   mpz_init(result);
@@ -164,7 +164,7 @@ void SeenTerminalGroup::indexInTerminalGroup(mpz_t result,
 
 
 // Create new iterator for this group
-SeenTerminalGroup::SeenTerminalGroupStringIterator* 
+SeenTerminalGroup::SeenTerminalGroupStringIterator*
     SeenTerminalGroup::getStringIterator() const {
   SeenTerminalGroupStringIterator *iterator =
     new SeenTerminalGroupStringIterator(this);
@@ -239,4 +239,3 @@ std::string SeenTerminalGroup::SeenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }
-

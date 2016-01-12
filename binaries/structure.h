@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Wed May 28 17:07:11 2014
-// 
+//
 
 // This file implements the Structure class which is a sequence of nonterminals
 // along with an associated probability.  It corresponds to the RHS of a
@@ -38,7 +38,7 @@ class PCFG;
 
 class Structure {
 public:
-  // As with the other grammar objects, this object is not initialized in the 
+  // As with the other grammar objects, this object is not initialized in the
   // constructor since initialization is a complex operation.
   Structure():
     nonterminals_(NULL),
@@ -50,7 +50,7 @@ public:
 
   // Initializer routine - loads the nonterminals from the grammar/terminalRules folder
   // Returns false on failure
-  bool loadStructure(const std::string& representation, 
+  bool loadStructure(const std::string& representation,
                      const double probability,
                      const std::string& source_ids,
                      NonterminalCollection* nonterminal_collection);
@@ -65,10 +65,10 @@ public:
   // the PCFG to query all structures, so we use a parent object.  Otherwise, we
   // have to generate some array of strings to send back to the PCFG and this might
   // not fit in memory.
-  bool generateStrings(const double cutoff, 
+  bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false,
                        const PCFG* parent = NULL) const;
-  std::string 
+  std::string
     convertStringToStructureRepresentation(const std::string& inputstring) const;
 
   // Count the number of ways the input string could be parsed by this structure

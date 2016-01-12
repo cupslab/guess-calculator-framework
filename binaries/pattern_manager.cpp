@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu May 29 14:52:57 2014
-// 
+//
 // See header file for additional information
 
 // Includes not covered in header file
@@ -70,8 +70,8 @@ bool PatternManager::Init(
   // Alternatively, we could look at the nonterminal pointers and check
   // for equivalence.  This is likely to work, but depends on implementation
   // details that I am not willing to depend on.
-  if (!InitGroupIDsAndCounts(representation, 
-                             structurebreakchar, 
+  if (!InitGroupIDsAndCounts(representation,
+                             structurebreakchar,
                              structure_size)) {
     return false;
   }
@@ -110,7 +110,7 @@ bool PatternManager::InitGroupIDsAndCounts(
       has_repeats_ = true;
       unsigned int seengroup = seen_nonterminal_ids.at(nonterminal_symbol);
       group_ids_[structure_size_] = seengroup;
-      ++group_counts_[seengroup];      
+      ++group_counts_[seengroup];
     } else {
       // This is a new nonterminal
       seen_nonterminal_ids[nonterminal_symbol] = next_group_id;
@@ -239,8 +239,8 @@ MixedRadixNumber* PatternManager::canonicalizePattern() const {
     return canonical_counter;
 
   // Define hash
-  typedef std::priority_queue<uint64_t, 
-                              std::vector<uint64_t>, 
+  typedef std::priority_queue<uint64_t,
+                              std::vector<uint64_t>,
                               std::greater<uint64_t>> MinHeap;
   std::unordered_map<unsigned int, MinHeap> sorted_group_values;
 
@@ -279,7 +279,7 @@ MixedRadixNumber* PatternManager::canonicalizePattern() const {
   if (!checkFirstPermutation(canonical_counter)) {
     fprintf(stderr, "After canonicalizing, checkFirstPermutation returns false"
                     " in PatternManager::canonicalizePattern!\n");
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
 
   return canonical_counter;
@@ -305,7 +305,7 @@ void PatternManager::countStrings(mpz_t result) const {
 // Get an array of iterators for terminals of the current pattern
 TerminalGroup::TerminalGroupStringIterator** PatternManager::getStringIterators()
    const {
-  TerminalGroup::TerminalGroupStringIterator** iterators = 
+  TerminalGroup::TerminalGroupStringIterator** iterators =
     new TerminalGroup::TerminalGroupStringIterator*[structure_size_];
 
   for (unsigned int i = 0; i < structure_size_; ++i) {
@@ -313,7 +313,7 @@ TerminalGroup::TerminalGroupStringIterator** PatternManager::getStringIterators(
     iterators[i] = nonterminals_[i]->getStringIteratorForGroup(group_index);
   }
 
-  return iterators;  
+  return iterators;
 }
 
 
@@ -345,7 +345,7 @@ bool PatternManager::checkFirstPermutation(MixedRadixNumber* pattern_counter) co
     unsigned int group_id = group_ids_[i];
 
     // Ignore groups that are not repeated -- they only have one element so are
-    // automatically monotonic    
+    // automatically monotonic
     if (group_counts_.at(group_id) > 1) {
       uint64_t digit = pattern_counter->getPlace(i);
       if (group_digits.count(group_id) > 0 &&
@@ -358,13 +358,13 @@ bool PatternManager::checkFirstPermutation(MixedRadixNumber* pattern_counter) co
 
   }
 
-  return true;  
+  return true;
 }
 
 
 // NOTE: This is not a const method and will overwrite the current pattern
 // counter.
-// 
+//
 // Given a vector of terminals, look up the terminals and then perform
 // several calculations to determine the rank of this inputstring in
 // the full set of strings*permutations that can be produced by this
@@ -439,7 +439,7 @@ LookupData* PatternManager::lookupAndSetPattern(const std::string *const termina
         delete terminal_lookups[j];
       }
       delete[] terminal_lookups;
-      return lookup_data;      
+      return lookup_data;
     }
   }
 
@@ -448,7 +448,7 @@ LookupData* PatternManager::lookupAndSetPattern(const std::string *const termina
   mpz_init_set_ui(rank_in_pattern, 0);
   for (unsigned int i = 0; i < structure_size_; ++i) {
     mpz_t strings_in_group;
-    nonterminals_[i]->countStringsOfGroup(strings_in_group, 
+    nonterminals_[i]->countStringsOfGroup(strings_in_group,
                                           pattern_counter_->getPlace(i));
     // Use the formula from: http://stackoverflow.com/a/759319
     mpz_mul(rank_in_pattern, rank_in_pattern, strings_in_group);
@@ -503,14 +503,14 @@ void PatternManager::countPermutations(mpz_t result) const {
 
   // For each group with repeats, we need to store counts for each digit of
   // that group
-  std::map<unsigned int, std::map<uint64_t, unsigned int>> *counts_within_groups = 
+  std::map<unsigned int, std::map<uint64_t, unsigned int>> *counts_within_groups =
     getCountsWithinRepeatingGroups();
 
   // We compute permutations within each repeated nonterminal group, and multiply
   // those counts together at each step to get a total count.
-  for (auto it = counts_within_groups->begin(); 
+  for (auto it = counts_within_groups->begin();
             it != counts_within_groups->end();
-            ++it) {    
+            ++it) {
     mpz_t group_perms;
     getPermutationsOfGroup(group_perms, &(it->second));
     mpz_mul(result, result, group_perms);
@@ -524,7 +524,7 @@ void PatternManager::countPermutations(mpz_t result) const {
 // Return a hash of hashes for each repeating group in the current pattern,
 // that counts the number of times specific terminal group ids repeat
 // in this pattern.
-std::map<unsigned int, std::map<uint64_t, unsigned int>>* 
+std::map<unsigned int, std::map<uint64_t, unsigned int>>*
     PatternManager::getCountsWithinRepeatingGroups() const {
 
   std::map<unsigned int,
@@ -534,7 +534,7 @@ std::map<unsigned int, std::map<uint64_t, unsigned int>>*
   for (unsigned int i = 0; i < structure_size_; ++i) {
     unsigned int group_id = group_ids_[i];
     if (group_counts_.at(group_id) > 1) {
-      uint64_t digit = pattern_counter_->getPlace(i);      
+      uint64_t digit = pattern_counter_->getPlace(i);
       // Add new hash table for this group if needed
       if (counts_within_groups->count(group_id) == 0) {
         std::map<uint64_t, unsigned int> child;
@@ -557,12 +557,12 @@ std::map<unsigned int, std::map<uint64_t, unsigned int>>*
 // Given a hash of digits to counts for a single nonterminal (such as one of
 // the hashes returned by getCountsWithinRepeatingGroups), return the number
 // of permutations.
-// 
+//
 // The number of permutations of a multiset = n! / m1!m2!m3!...mt!
 // where n is the total size of the multiset, and m_i are the counts for
 // each distinct value.  Using the terminology from Wikipedia, n is the total
 // cardinality of the multiset, and m_i are the multiplicities of each member.
-// 
+//
 void PatternManager::getPermutationsOfGroup(mpz_t result,
     std::map<uint64_t, unsigned int>* counts) const {
   mpz_init(result);
@@ -701,7 +701,7 @@ void PatternManager::getPermutationRank(mpz_t result) const {
 
   // Iterate over repeating groups
   // Since we are using a std::map, this will iterate in order of group_id
-  for (auto it = counts_within_groups->begin(); 
+  for (auto it = counts_within_groups->begin();
        it != counts_within_groups->end(); ++it) {
     mpz_t rank;
     mpz_init_set_ui(rank, 0);
@@ -753,7 +753,7 @@ void PatternManager::getPermutationRank(mpz_t result) const {
       mpz_div_ui(current_perms, current_perms, current_size);
       --(it->second[digit]);  // Consume / reduce the multiplicity of this
                               // digit going forward
-      
+
       --current_size;
       ++k;
     }

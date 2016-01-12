@@ -1,4 +1,4 @@
-// unseen_terminal_group.cpp - a class for handling "unseen" terminal groups, 
+// unseen_terminal_group.cpp - a class for handling "unseen" terminal groups,
 //   which fill in the gap in training data that would be occupied by unseen
 //   terminals
 //
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri Jul 18 10:50:19 2014
-// 
+//
 // See header file for additional information
 
 // Includes not covered in header file
@@ -24,10 +24,10 @@
 #include "unseen_terminal_group.h"
 
 // Non-literal static class members cannot be initialized in the class body
-const std::string UnseenTerminalGroup::kGeneratorSymbols = 
+const std::string UnseenTerminalGroup::kGeneratorSymbols =
   "`~!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/\? ";
 
-UnseenTerminalGroup::UnseenTerminalGroup(const char *terminal_data, 
+UnseenTerminalGroup::UnseenTerminalGroup(const char *terminal_data,
                                          const double probability,
                                          const std::string& generator_mask,
                                          const std::string& out_representation,
@@ -55,18 +55,18 @@ UnseenTerminalGroup::UnseenTerminalGroup(const char *terminal_data,
   if (!processSeenTerminals()) {
     fprintf(stderr, "Failed processing seen terminals in UnseenTerminalGroup"
                     " constructor!\n");
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
   }
 }
 
 
 // Called from the constructor, this routine iterates over the seen terminals
-// in terminal_data_ and determines the count of seen terminals 
+// in terminal_data_ and determines the count of seen terminals
 // (seen_terminals_size_), count of unseen terminals (terminals_size_),
 // total number of generatable terminals (total_terminals_),
 // probability of each individual terminal (probability_),
 // and the value of the first unseen string.
-// 
+//
 // Return false on any error
 //
 bool UnseenTerminalGroup::processSeenTerminals() {
@@ -74,8 +74,8 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   const char *data_position = terminal_data_;
   size_t bytes_remaining = terminal_data_size_;
   mpz_t seen_terminals_size, seen_terminals_cant_be_generated;
-  mpz_init_set_ui(seen_terminals_size, 0);  
-  mpz_init_set_ui(seen_terminals_cant_be_generated, 0);  
+  mpz_init_set_ui(seen_terminals_size, 0);
+  mpz_init_set_ui(seen_terminals_cant_be_generated, 0);
   while (bytes_remaining > 0) {
     // Read the current line
     char read_buffer[1024];
@@ -97,7 +97,7 @@ bool UnseenTerminalGroup::processSeenTerminals() {
     if (canGenerateTerminal(terminal))
       mpz_add_ui(seen_terminals_size, seen_terminals_size, 1);
     else
-      mpz_add_ui(seen_terminals_cant_be_generated, 
+      mpz_add_ui(seen_terminals_cant_be_generated,
                  seen_terminals_cant_be_generated, 1);
 
     // Move counters forward
@@ -137,7 +137,7 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   bool space_traversed = false;
   if (static_bitarray == nullptr) {
     // fprintf(stderr, "Initializing static BitArray object...");
-    static_bitarray = new BitArray(kTerminalSearchRegionSize);    
+    static_bitarray = new BitArray(kTerminalSearchRegionSize);
     // fprintf(stderr, "done!\n");
   }
   if (ba_in_use) {
@@ -177,7 +177,7 @@ bool UnseenTerminalGroup::processSeenTerminals() {
     // Move region forward
     mpz_set(region_start, region_end);
     mpz_clear(region_end);
-  }  // end while (!first_open_index_found && !space_traversed)  
+  }  // end while (!first_open_index_found && !space_traversed)
   // delete found_terminals;
   ba_in_use = false;  // free the lock
   mpz_clear(region_start);
@@ -216,7 +216,7 @@ void UnseenTerminalGroup::initCharacterLookups() {
   }
 
   for (int i = '0'; i <= '9'; ++i) {
-    d_char_to_int_[i] = i - '0';  
+    d_char_to_int_[i] = i - '0';
     d_int_to_char_[i - '0'] = i;
   }
 
@@ -295,7 +295,7 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
 // The general algorithm is that for converting a mixed-radix number to base 10.
 // The bases for each position of the terminal are given by the number of
 // possible characters indicated by the character of the generator mask.
-// 
+//
 // region_end provides an optional stopping criteria.  It can be very costly
 // to determine a terminalIndex because it requires multiplication of BigInts,
 // so if region_end is specified and the index is found to be above it, we stop
@@ -303,7 +303,7 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
 // above region_end, but its value should be ignored!
 //
 void UnseenTerminalGroup::terminalIndex(mpz_t result,
-                                        const std::string& terminal, 
+                                        const std::string& terminal,
                                         mpz_t region_end /*= NULL*/) const {
   mpz_init_set_ui(result, 0);
 
@@ -339,7 +339,7 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
                       "  In terminalIndex with out_representation_: %s!\n",
                       i, generator_mask_.c_str(), terminal[i],
                       terminal.c_str(), out_representation_.c_str());
-      exit(EXIT_FAILURE);      
+      exit(EXIT_FAILURE);
     }
     // Use the formula from: http://stackoverflow.com/a/759319
     mpz_mul_ui(result, result, character_base);
@@ -495,7 +495,7 @@ void UnseenTerminalGroup::findUnseenTerminals(
     bytes_remaining -= bytes_read;
   }  // end while (bytes_remaining > 0)
   mpz_clear(region_end);
-  
+
   return;
 }
 
@@ -524,7 +524,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
     terminalIndex(lookup_data->index, terminal);
   else {
     lookup_data->parse_status = kTerminalNotFound | kTerminalCantBeGenerated;
-    lookup_data->probability = -1;    
+    lookup_data->probability = -1;
     mpz_init(lookup_data->index);
     mpz_set_si(lookup_data->index, -1);
     return lookup_data;
@@ -571,11 +571,11 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
         }
         mpz_clear(terminal_index);
         lookup_data->parse_status = kTerminalNotFound | kTerminalCollision;
-        lookup_data->probability = -1;    
+        lookup_data->probability = -1;
         mpz_set_si(lookup_data->index, -1);
         mpz_clear(lower_count);
         return lookup_data;
-      }      
+      }
       mpz_clear(terminal_index);
     }
     // Move counters forward
@@ -584,7 +584,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
   }  // end while (bytes_remaining > 0)
 
   lookup_data->parse_status = kCanParse;
-  lookup_data->probability = probability_;    
+  lookup_data->probability = probability_;
   mpz_sub(lookup_data->index, lookup_data->index, lower_count);
   mpz_clear(lower_count);
   // Set source id
@@ -593,11 +593,11 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
 }
 
 
-// Return the "index" of the given string in the unseen terminals 
+// Return the "index" of the given string in the unseen terminals
 // (negative result if no match)
 //
 // This function simply calls lookup, and then returns just the index
-// 
+//
 void UnseenTerminalGroup::indexInTerminalGroup(mpz_t result,
                                                const std::string& teststring) const {
   LookupData *lookup_data = lookup(teststring);
@@ -611,7 +611,7 @@ void UnseenTerminalGroup::indexInTerminalGroup(mpz_t result,
 
 
 // Create new iterator for this group
-UnseenTerminalGroup::UnseenTerminalGroupStringIterator* 
+UnseenTerminalGroup::UnseenTerminalGroupStringIterator*
     UnseenTerminalGroup::getStringIterator() const {
   UnseenTerminalGroupStringIterator *iterator =
     new UnseenTerminalGroupStringIterator(this);
@@ -642,7 +642,7 @@ UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
   found_terminals_ = new BitArray(kTerminalSearchRegionSize);
   parent_->findUnseenTerminals(
     region_start_, kTerminalSearchRegionSize, found_terminals_);
-  current_bitarray_index_ = -1;  
+  current_bitarray_index_ = -1;
   increment();
 }
 
@@ -655,9 +655,9 @@ UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
 // Increment the iterator by one and set current_string_ to the new value
 // Return false if we are past the end
 bool UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
-    increment() {      
+    increment() {
   if (!isEnd()) {
-    unsigned long int new_index = 
+    unsigned long int new_index =
       found_terminals_->findNextOpenSpace(static_cast<unsigned long int>(current_bitarray_index_ + 1));
 
     // Recurse if no unseen terminals left in the current region
@@ -704,7 +704,7 @@ void UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
   current_bitarray_index_ = -1;
   parent_->findUnseenTerminals(
     region_start_, kTerminalSearchRegionSize, found_terminals_);
-  increment();  
+  increment();
 }
 
 // Simple check
@@ -721,4 +721,3 @@ std::string UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }
-

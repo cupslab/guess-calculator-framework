@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu Jun  5 12:41:51 2014
-// 
+//
 // Structures can be represented as a sequence of nonterminals, and each
 // nonterminal produces a number of terminal groups.  To iterate over all
 // productions of a structure, we can represent each nonterminal with a counter
@@ -19,7 +19,7 @@
 // naturally represented with a mixed-radix number, with one position for each
 // nonterminal, and the base of each position given by the number of terminal
 // groups that it produces.
-// 
+//
 // If the counters are then organized such that 0 corresponds to terminals
 // with highest probability and probabilities decrease as counters increase,
 // we can implement an "intelligent skipping" algorithm to speed up traversal
@@ -32,7 +32,7 @@
 // not known to be less than the current number.  For example, if the current
 // number is 34502, then Increment would go to 34503.  We know that 34503 will
 // have a lower probability than 34502, because a higher digit in a given
-// position is guaranteed to have a lower probability than a lower digit. 
+// position is guaranteed to have a lower probability than a lower digit.
 // IntelligentSkip would take 34502 and go to 34510.  Similarly, 34510 should
 // IntelligentSkip to 34600.
 //
@@ -55,9 +55,9 @@ public:
   // Construct object with given radices and all digits set to 0
   MixedRadixNumber(const uint64_t *radices, const unsigned int size);
   ~MixedRadixNumber();
-  
+
   // Reset all digits to zero
-  void clear();  
+  void clear();
 
   // The following routines return false on overflow
   bool increment();

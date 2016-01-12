@@ -8,9 +8,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Thu Jun  5 23:42:55 2014
-// 
+//
 // TODO: This class is too large and unwieldy.  Some of its functionality
 // should be delegated to other classes.
 //
@@ -122,13 +122,13 @@ public:
   double getPatternProbability() const;
   // Get the number of strings it would produce
   // By convention, mpz_t types are not returned, but are passed by reference
-  // See http://stackoverflow.com/a/13396028  
+  // See http://stackoverflow.com/a/13396028
   void countStrings(mpz_t result) const;
   // Get an array of iterators for terminals of the current pattern
   TerminalGroup::TerminalGroupStringIterator** getStringIterators() const;
 
   // Check if the current pattern is the first of a permutation
-  // This returns true if the pattern cannot be compacted    
+  // This returns true if the pattern cannot be compacted
   bool isFirstPermutation() const;
   // Get the number of permutations of the current pattern
   // This returns 1 if the pattern cannot be compacted
