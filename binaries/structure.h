@@ -68,6 +68,11 @@ public:
   bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false,
                        const PCFG* parent = NULL) const;
+
+  bool generateRandomStrings(const uint32_t number,
+                             const bool accurate_probabilities = false,
+                             const PCFG* parent = NULL) const;
+
   std::string
     convertStringToStructureRepresentation(const std::string& inputstring) const;
 

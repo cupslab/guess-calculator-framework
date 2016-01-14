@@ -1,5 +1,5 @@
 # Makefile for guess calculator framework tools
-# 
+#
 # Use of this source code is governed by the GPLv2 license that can be found
 #   in the LICENSE file.
 #
@@ -7,7 +7,7 @@
 # Author: Saranga Komanduri
 #
 CC = g++
-CFLAG =-O0 -g -std=c++0x
+CFLAG =-O0 -g -std=c++11
 # Enable the following options (and add \ to the above line) for more warnings
 # -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
 # -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept \

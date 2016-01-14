@@ -14,9 +14,12 @@
 // See header file for additional information
 
 // Includes not covered in header file
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <random>
+#include <sstream>
+#include <stdint.h>
+
 #include "pattern_manager.h"
 #include "terminal_group.h"
 #include "grammar_tools.h"
@@ -297,6 +300,141 @@ bool Structure::generateStrings(
 
   // If we are here, we have iterated over the complete space of patterns
   // covered by this structure!
+  delete pattern_manager;
+  return true;
+}
+
+
+// Generate strings randomly according to the probability distribution of this
+// PCFG. This method is designed to be used with Monte Carlo methods for guess
+// number calculation.
+//
+// Pattern compaction is ignored for this method because it offers no benefit
+// for Monte Carlo methods.
+bool Structure::generateRandomStrings(const uint32_t number,
+                                      const bool accurate_probabilities,
+                                      const PCFG *const parent) const {
+  // Initialize pattern manager but use 1 for the base probability instead of
+  // the probability of the structure. This is so that we get conditional
+  // probabilities from the pattern_manager.
+  PatternManager *pattern_manager = new PatternManager;
+  if (!pattern_manager->Init(representation_,
+                             kStructureBreakChar,
+                             nonterminals_size_,
+                             nonterminals_,
+                             1)) {
+    return false;
+  }
+
+  std::vector<double> random_numbers(number);
+
+  // Create a random number generator and distribution
+  // Replace rd() with a static seed if desired
+  std::random_device rd;
+  std::mt19937 mt_random_generator(rd());
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  for (int i = 0; i < number; i++) {
+    random_numbers[i] = distribution(mt_random_generator);
+  }
+  std::sort(random_numbers.begin(), random_numbers.end());
+
+  // Iterate over all patterns
+  bool patterns_left = true;
+  double cumulative_probability = 0;
+  uint32_t random_number_index = 0;
+  while (patterns_left) {
+    patterns_left = pattern_manager->incrementPatternCounter();
+    double pattern_probability = pattern_manager->getPatternProbability();
+
+    std::string first_string_of_pattern =
+      pattern_manager->getCanonicalizedFirstStringOfPattern();
+
+    // Iterate over all the strings that this pattern would produce using
+    // TerminalGroupStringIterator objects
+    TerminalGroup::TerminalGroupStringIterator **iterators =
+      pattern_manager->getStringIterators();
+
+    // Iterate until the first iterator overflows -- an overflow is indicated
+    // by false returned from an increment call
+    bool strings_left = true;
+    while (strings_left) {
+      // Build the current string and output to stdout or check and return
+      std::string current_string = "";
+      for (unsigned int i = 0; i < nonterminals_size_; ++i)
+        current_string.append(iterators[i]->getCurrentString());
+      double probability;
+      if (accurate_probabilities) {
+        LookupData *total_lookup = parent->lookupSum(current_string);
+
+        // Check for catastrophic failure
+        if ( (total_lookup->parse_status & kUnexpectedFailure) ||
+             !(total_lookup->parse_status & kCanParse) ) {
+          fprintf(stderr,
+            "String generation returned a string that could not be parsed?!?"
+            " for structure %s and inputstring %s!\n",
+            representation_.c_str(), current_string.c_str());
+          exit(EXIT_FAILURE);
+        }
+
+        // We only want one copy of each string to be produced, so only print
+        // if the string in the lookup structure matches the current pattern
+        // (this indicates that this structure was the highest probability
+        // structure for this string).  We are sure that one of the string's
+        // structures will print this string since it must be above the cutoff
+        // for this structure (otherwise we wouldn't be producing it), so the
+        // highest probability structure for this string must also have it
+        // above the cutoff.
+        if (total_lookup->first_string_of_pattern == first_string_of_pattern) {
+          probability = total_lookup->probability;
+        } else {
+          // This one doesn't count because it is not the highest probability
+          // structure for this string. Give it 0 probability.
+          probability = 0;
+        }
+      } else {
+        probability = pattern_probability;
+      }
+
+      // Increase the probability by this amount so that web can move forward
+      cumulative_probability += probability;
+      while (random_numbers[random_number_index] <= cumulative_probability) {
+        // Output this random password to stdout
+        printf("%a\t%s\n", probability, current_string.c_str());
+        random_number_index += 1;
+        if (random_number_index >= number) {
+          strings_left = false;
+          patterns_left = false;
+          break;
+        }
+      }
+
+      // Increment the string iterators as needed
+      long int iter_index = nonterminals_size_ - 1;
+      while (!iterators[iter_index]->increment()) {
+        // This iterator overflowed, reset it and increment the previous one
+        iterators[iter_index]->restart();
+        --iter_index;
+        if (iter_index < 0) {
+          // The most significant iterator overflowed, we have to stop here
+          strings_left = false;
+          break;
+        }
+      }
+    }
+    // Free iterators
+    for (unsigned int i = 0; i < nonterminals_size_; ++i)
+      delete iterators[i];
+    delete[] iterators;
+
+  }
+
+  if (random_number_index < number) {
+    fprintf(stderr,
+            "Error: Random string generation did not produce as many "
+            "strings as expected. This is a bug!?!?!\n");
+    exit(EXIT_FAILURE);
+  }
+
   delete pattern_manager;
   return true;
 }
