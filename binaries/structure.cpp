@@ -14,6 +14,7 @@
 // See header file for additional information
 
 // Includes not covered in header file
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <random>
