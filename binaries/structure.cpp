@@ -321,6 +321,10 @@ bool Structure::generateRandomStrings(const uint64_t number,
                                       std::mt19937 generator,
                                       const bool accurate_probabilities,
                                       const PCFG *const parent) const {
+  if (number == 0) {
+    return true;
+  }
+
   // Initialize pattern manager but use 1 for the base probability instead of
   // the probability of the structure. This is so that we get conditional
   // probabilities from the pattern_manager.
