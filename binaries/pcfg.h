@@ -78,6 +78,7 @@ class PCFG {
   bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false) const;
   bool generateRandomStrings(const uint64_t number,
+                             const bool pattern_compaction,
                              const bool accurate_probabilities) const;
 
   // Run lookups for each structure in the grammar and return a LookupData

@@ -184,6 +184,7 @@ bool PCFG::generateStrings(const double cutoff,
 
 
 bool PCFG::generateRandomStrings(const uint64_t number,
+                                 const bool pattern_compaction,
                                  const bool accurate_probabilities) const {
 
   // Create a random number generator and distribution
@@ -220,13 +221,12 @@ bool PCFG::generateRandomStrings(const uint64_t number,
       fflush(stderr);
     }
     if (accurate_probabilities) {
-      if (!structures_[i].generateRandomStrings(assigned,
-                                                mt_random_generator,
-                                                true,
-                                                this))
+      if (!structures_[i].generateRandomStrings
+          (assigned, mt_random_generator, false, true, this))
         return false;
     } else {
-      if (!structures_[i].generateRandomStrings(assigned, mt_random_generator))
+      if (!structures_[i].generateRandomStrings
+          (assigned, mt_random_generator, pattern_compaction, false, this))
         return false;
     }
   }

@@ -14,7 +14,8 @@ void help() {
            "Usage Info\n"
            "\tOptions\n"
            "\t-number <integer>: Generate number of passwords\n"
-           "\t-accupr: (optional) Output true string probabilityes for each guess by\n"
+           "\t-accupr: (optional) Output true string probabilities for each guess by\n"
+           "\t-pc: (optional) Use pattern compaction. Not compatible with accurate probabilities\n"
            "\t\t summing over all tokenizations  (note this is not needed if you have\n"
            "\t\ttokenized by character class because there is only one tokenization\n"
            "\t\tper string in that case)\n"
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
     std::string structure_file = "grammar/nonterminalRules.txt";
     std::string terminal_folder = "grammar/terminalRules/";
     bool accurate_probabilities = false;
+    bool pattern_compaction = false;
     uint64_t number = 0;
 
     // Parse command-line arguments
@@ -51,6 +53,8 @@ int main(int argc, char *argv[]) {
             }
         } else if (commandLineInput.find("-accupr") == 0) {
             accurate_probabilities = true;
+        } else if (commandLineInput.find("-pc") == 0) {
+            pattern_compaction = true;
         } else if (commandLineInput.find("-sfile") == 0) {
             ++i;
             if (i < argc)
@@ -75,6 +79,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (pattern_compaction && accurate_probabilities) {
+        fprintf(stderr, "Error: Cannot use accurate probabilities with pattern"
+                " compaction option. \n");
+        help();
+        return 1;
+    }
+
     fprintf(stderr, "\nNumber: %" PRId64 "\n"
             "Using structure file: %s\n"
             "Using terminal folder: %s\n\n",
@@ -86,7 +97,8 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "done!\n");
 
     fprintf(stderr, "Begin generating strings...\n");
-    if (pcfg.generateRandomStrings(number, accurate_probabilities))
+    if (pcfg.generateRandomStrings
+        (number, pattern_compaction, accurate_probabilities))
         fprintf(stderr, "done!\n");
     else {
         fprintf(stderr, "\nError while generating strings!\n");

@@ -26,11 +26,12 @@
 #include <cstdint>
 #include <random>
 
-#include "pcfg.h"
 #include "gcfmacros.h"
+#include "lookup_data.h"
 #include "nonterminal.h"
 #include "nonterminal_collection.h"
-#include "lookup_data.h"
+#include "pattern_manager.h"
+#include "pcfg.h"
 
 // Forward declare class because we have circular includes to make generateStrings
 // work (it needs to query the parent PCFG for each string if we want accurate
@@ -76,6 +77,7 @@ public:
   // possible.
   bool generateRandomStrings(const uint64_t number,
                              std::mt19937 generator,
+                             const bool pattern_compaction = false,
                              const bool accurate_probabilities = false,
                              const PCFG* parent = NULL) const;
 
@@ -93,6 +95,16 @@ public:
   double getProbability();
 
 private:
+  uint64_t generateRandomStringNoPatternCompactionHelper
+    (PatternManager* pattern_manager,
+     std::vector<double>& random_numbers,
+     const bool accurate_probabilities,
+     const PCFG *const parent) const;
+
+  uint64_t generateRandomStringPatternCompactionHelper
+    (PatternManager* pattern_manager,
+     std::vector<double>& random_numbers) const;
+
   // This must match the value used when the grammar was written
   static const char kStructureBreakChar = 'E';
 
