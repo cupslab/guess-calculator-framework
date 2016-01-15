@@ -26,7 +26,7 @@ CLASS_OBJ_FILES = $(CLASS_CPP_FILES:.cpp=.o)
 
 default: main
 
-main: GeneratePatterns sortedcountaggregator LookupGuessNumbers GenerateStrings GenerateRandomStrings
+main: GeneratePatterns sortedcountaggregator LookupGuessNumbers GenerateStrings GenerateRandomStrings LookupProbabilities
 
 # Binaries must be compiled with the GMP library
 GeneratePatterns: GeneratePatterns.o
@@ -45,6 +45,12 @@ GenerateRandomStrings: GenerateRandomStrings.o
 	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) $< -o $@ -lgmpxx -lgmp
 
 GenerateRandomStrings.o: GenerateRandomStrings.cpp .classes
+	$(CC) $(CFLAG) -c $<
+
+LookupProbabilities: LookupProbabilities.o
+	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) $< -o $@ -lgmpxx -lgmp
+
+LookupProbabilities.o: LookupProbabilities.cpp .classes
 	$(CC) $(CFLAG) -c $<
 
 LookupGuessNumbers: LookupGuessNumbers.o
