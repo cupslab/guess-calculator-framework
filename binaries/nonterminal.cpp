@@ -360,7 +360,19 @@ uint64_t Nonterminal::produceRandomTerminalGroup(std::mt19937 generator) const {
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
   double prob = distribution(generator);
   for (uint64_t i = 0; i < terminal_groups_size_; i++) {
-    prob -= getProbabilityOfGroup(i);
+    mpz_t strings_in_group;
+    mpf_t strings_in_group_f;
+    mpf_t prob_in_group;
+    mpz_init(strings_in_group);
+    mpf_init_set_d(prob_in_group, getProbabilityOfGroup(i));
+    mpf_init(strings_in_group_f);
+    countStringsOfGroup(strings_in_group, i);
+    mpf_set_z(strings_in_group_f, strings_in_group);
+    mpf_mul(prob_in_group, prob_in_group, strings_in_group_f);
+    prob -= mpf_get_d(prob_in_group);
+    mpz_clear(strings_in_group);
+    mpf_clear(strings_in_group_f);
+    mpf_clear(prob_in_group);
     if (prob < 0) {
       return i;
     }
