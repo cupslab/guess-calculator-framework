@@ -457,14 +457,6 @@ uint64_t Structure::generateRandomStringPatternCompactionHelper
           break;
         }
       }
-
-      // Get the pattern identifier -- I use the first string that would be
-      // produced by the pattern
-      std::string pattern_representation =
-        pattern_manager->getFirstStringOfPattern();
-
-      // Output to stdout
-      printf("%a\t%s\n", pattern_probability, pattern_representation.c_str());
       mpz_clear(string_count);
       mpz_clear(permutation_count);
       mpz_clear(total_count);
