@@ -71,15 +71,13 @@ public:
                        const bool accurate_probabilities = false,
                        const PCFG* parent = NULL) const;
 
+
   // Mersenne twister engine is used for random numbers here because they
   // should create the same numbers on different systems, and because they are
   // fast. It would be good to use an abstract random number engine here if
   // possible.
   bool generateRandomStrings(const uint64_t number,
-                             std::mt19937 generator,
-                             const bool pattern_compaction = false,
-                             const bool accurate_probabilities = false,
-                             const PCFG* parent = NULL) const;
+                             std::mt19937 generator) const;
 
   std::string
     convertStringToStructureRepresentation(const std::string& inputstring) const;
@@ -95,16 +93,6 @@ public:
   double getProbability();
 
 private:
-  uint64_t generateRandomStringNoPatternCompactionHelper
-    (PatternManager* pattern_manager,
-     std::vector<double>& random_numbers,
-     const bool accurate_probabilities,
-     const PCFG *const parent) const;
-
-  uint64_t generateRandomStringPatternCompactionHelper
-    (PatternManager* pattern_manager,
-     std::vector<double>& random_numbers) const;
-
   // This must match the value used when the grammar was written
   static const char kStructureBreakChar = 'E';
 

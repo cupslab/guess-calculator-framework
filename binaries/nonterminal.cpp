@@ -354,6 +354,31 @@ std::string Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
 
   return terminal_groups_[group_index]->getFirstString();
 }
+
+
+uint64_t Nonterminal::produceRandomTerminalGroup(std::mt19937 generator) const {
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  double prob = distribution(generator);
+  for (uint64_t i = 0; i < terminal_groups_size_; i++) {
+    prob -= getProbabilityOfGroup(i);
+    if (prob < 0) {
+      return i;
+    }
+  }
+  fprintf(stderr,
+          "Error: Should not go here! Nonterminal::produceRandomTerminalGroup. "
+          "Your randomness is all wrong!?!?!\n");
+  return 0;
+}
+
+
+std::string Nonterminal::produceRandomStringOfGroup
+(uint64_t group_index, std::mt19937 generator) const {
+  // For now this is random enough...
+  return getFirstStringOfGroup(group_index);
+}
+
+
 //
 double Nonterminal::getProbabilityOfGroup(uint64_t group_index) const {
   if (group_index >= terminal_groups_size_) {

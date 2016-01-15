@@ -19,7 +19,7 @@ def main(args):
     for row in csv.reader(args.randomfile, delimiter='\t', quotechar=None):
         prob, pwd = row
         if prob > 0:
-            calculator.serialize(pwd, prob)
+            calculator.serialize(pwd, float.fromhex(prob))
     calculator.finish()
 
 if __name__=='__main__':

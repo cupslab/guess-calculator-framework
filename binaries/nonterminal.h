@@ -38,9 +38,10 @@
 #ifndef NONTERMINAL_H__
 #define NONTERMINAL_H__
 
-#include <gmp.h>
-#include <string>
 #include <cstdint>
+#include <gmp.h>
+#include <random>
+#include <string>
 
 #include "gcfmacros.h"
 #include "terminal_group.h"
@@ -71,6 +72,14 @@ public:
   // a LookupData struct with relevant fields set
   TerminalLookupData* lookup(const std::string& inputstring) const;
   bool canProduceTerminal(const std::string& inputstring) const;
+
+  // Returns a random terminal group according to the probability of each
+  // group. Returns the group id of the selected group. It uses the passed
+  // generator for randomness.
+  uint64_t produceRandomTerminalGroup(std::mt19937 generator) const;
+
+  std::string produceRandomStringOfGroup
+    (uint64_t group_index, std::mt19937 generator) const;
 
   // Routines for getting values from the terminal groups
   std::string getFirstStringOfGroup(uint64_t group_index) const;

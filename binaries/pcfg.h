@@ -77,9 +77,7 @@ class PCFG {
   bool generatePatterns(const double cutoff) const;
   bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false) const;
-  bool generateRandomStrings(const uint64_t number,
-                             const bool pattern_compaction,
-                             const bool accurate_probabilities) const;
+  bool generateRandomStrings(const uint64_t number) const;
 
   // Run lookups for each structure in the grammar and return a LookupData
   // struct with the "best" lookup (highest probability / summed probabilities)
