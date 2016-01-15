@@ -14,9 +14,13 @@
 // See header file for additional information
 
 // Includes not covered in header file
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <errno.h>
+#include <inttypes.h>
+#include <random>
+
 #include "grammar_tools.h"
 
 #include "pcfg.h"
@@ -176,6 +180,54 @@ bool PCFG::generateStrings(const double cutoff,
   return true;
 }
 
+
+bool PCFG::generateRandomStrings(const uint64_t number,
+                                 const bool accurate_probabilities) const {
+
+  // Create a random number generator and distribution
+  // Replace rd() with a static seed if desired
+  std::random_device rd;
+  std::mt19937 mt_random_generator(rd());
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  std::vector<double> random_numbers(number);
+  for (uint64_t i = 0; i < number; i++) {
+    random_numbers[i] = distribution(mt_random_generator);
+  }
+  std::sort(random_numbers.begin(), random_numbers.end());
+
+  uint64_t random_number_index = 0;
+  double cumulative_probability = 0;
+  for (unsigned int i = 0; i < structures_size_; ++i) {
+    uint64_t assigned = 0;
+    cumulative_probability += structures_[i].getProbability();
+    while (random_numbers[random_number_index] <= cumulative_probability) {
+      random_number_index += 1;
+      assigned += 1;
+      if (random_number_index >= number) {
+        i = structures_size_;
+        break;
+      }
+    }
+    if (accurate_probabilities) {
+      if (!structures_[i].generateRandomStrings(assigned,
+                                                mt_random_generator,
+                                                true,
+                                                this))
+        return false;
+    } else {
+      if (!structures_[i].generateRandomStrings(assigned, mt_random_generator))
+        return false;
+    }
+  }
+  if (random_number_index < number) {
+    fprintf(stderr,
+            "Error: Random string generation did not produce as many strings as"
+            " expected. This is a bug!?!?! Was expecting to generate %" PRIu64
+            " passwords but generated %" PRIu64 " in "
+            "PCFG::generateRandomStrings\n", number, random_number_index);
+  }
+  return true;
+}
 
 // Given a string, count up the ways it can be parsed over all structures
 uint64_t PCFG::countParses(const std::string& inputstring) const {

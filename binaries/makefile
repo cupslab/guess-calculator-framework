@@ -41,6 +41,12 @@ GenerateStrings: GenerateStrings.o
 GenerateStrings.o: GenerateStrings.cpp .classes
 	$(CC) $(CFLAG) -c GenerateStrings.cpp
 
+GenerateRandomStrings: GenerateRandomStrings.o
+	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) $< -o $@ -lgmpxx -lgmp
+
+GenerateRandomStrings.o: GenerateRandomStrings.cpp .classes
+	$(CC) $(CFLAGS) -c $<
+
 LookupGuessNumbers: LookupGuessNumbers.o
 	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) LookupGuessNumbers.o -o LookupGuessNumbers -lgmpxx -lgmp
 

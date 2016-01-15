@@ -24,6 +24,7 @@
 #include <gmp.h>
 #include <string>
 #include <cstdint>
+#include <random>
 
 #include "pcfg.h"
 #include "gcfmacros.h"
@@ -69,7 +70,12 @@ public:
                        const bool accurate_probabilities = false,
                        const PCFG* parent = NULL) const;
 
-  bool generateRandomStrings(const uint32_t number,
+  // Mersenne twister engine is used for random numbers here because they
+  // should create the same numbers on different systems, and because they are
+  // fast. It would be good to use an abstract random number engine here if
+  // possible.
+  bool generateRandomStrings(const uint64_t number,
+                             std::mt19937 generator,
                              const bool accurate_probabilities = false,
                              const PCFG* parent = NULL) const;
 
@@ -83,6 +89,8 @@ public:
   // Given a string, determine if it can be produced by this structure and
   // return a LookupData struct with relevant fields set
   LookupData* lookup(const std::string& inputstring) const;
+
+  double getProbability();
 
 private:
   // This must match the value used when the grammar was written

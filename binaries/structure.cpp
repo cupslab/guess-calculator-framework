@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
-#include <random>
+#include <inttypes.h>
 #include <sstream>
 #include <stdint.h>
 
@@ -195,6 +195,11 @@ bool Structure::generatePatterns(const double cutoff) const {
 }
 
 
+double Structure::getProbability() {
+  return probability_;
+}
+
+
 // Generate all strings from this structure whose probability is above
 // the given cutoff.
 // Output to stdout.
@@ -312,7 +317,8 @@ bool Structure::generateStrings(
 //
 // Pattern compaction is ignored for this method because it offers no benefit
 // for Monte Carlo methods.
-bool Structure::generateRandomStrings(const uint32_t number,
+bool Structure::generateRandomStrings(const uint64_t number,
+                                      std::mt19937 generator,
                                       const bool accurate_probabilities,
                                       const PCFG *const parent) const {
   // Initialize pattern manager but use 1 for the base probability instead of
@@ -328,21 +334,16 @@ bool Structure::generateRandomStrings(const uint32_t number,
   }
 
   std::vector<double> random_numbers(number);
-
-  // Create a random number generator and distribution
-  // Replace rd() with a static seed if desired
-  std::random_device rd;
-  std::mt19937 mt_random_generator(rd());
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
-  for (int i = 0; i < number; i++) {
-    random_numbers[i] = distribution(mt_random_generator);
+  for (uint64_t i = 0; i < number; i++) {
+    random_numbers[i] = distribution(generator);
   }
   std::sort(random_numbers.begin(), random_numbers.end());
 
   // Iterate over all patterns
   bool patterns_left = true;
   double cumulative_probability = 0;
-  uint32_t random_number_index = 0;
+  uint64_t random_number_index = 0;
   while (patterns_left) {
     patterns_left = pattern_manager->incrementPatternCounter();
     double pattern_probability = pattern_manager->getPatternProbability();
@@ -431,9 +432,10 @@ bool Structure::generateRandomStrings(const uint32_t number,
 
   if (random_number_index < number) {
     fprintf(stderr,
-            "Error: Random string generation did not produce as many "
-            "strings as expected. This is a bug!?!?!\n");
-    exit(EXIT_FAILURE);
+            "Error: Random string generation did not produce as many strings as"
+            " expected. This is a bug!?!?! Was expecting to generate %" PRIu64
+            " passwords but generated %" PRIu64 " in "
+            "Structure::generateRandomStrings\n", number, random_number_index);
   }
 
   delete pattern_manager;
