@@ -69,5 +69,6 @@ clean:
 	rm -f sortedcountaggregator
 	rm -f LookupGuessNumbers
 	rm -f GenerateStrings
+	rm -f GenerateRandomStrings
 	rm -f .classes
 	rm -f *.o
