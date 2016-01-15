@@ -457,6 +457,9 @@ uint64_t Structure::generateRandomStringPatternCompactionHelper
           break;
         }
       }
+      if (!patterns_left) {
+        break;
+      }
       mpz_clear(string_count);
       mpz_clear(permutation_count);
       mpz_clear(total_count);
