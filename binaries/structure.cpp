@@ -333,7 +333,7 @@ bool Structure::generateRandomStrings(const uint64_t number,
                              kStructureBreakChar,
                              nonterminals_size_,
                              nonterminals_,
-                             1)) {
+                             1.0)) {
     return false;
   }
 

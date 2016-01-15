@@ -197,14 +197,14 @@ bool PCFG::generateRandomStrings(const uint64_t number,
 
   uint64_t random_number_index = 0;
   double cumulative_probability = 0;
-  for (unsigned int i = 0; i < structures_size_; ++i) {
+  for (unsigned int i = 0;
+       i < structures_size_ && random_number_index < number; ++i) {
     uint64_t assigned = 0;
     cumulative_probability += structures_[i].getProbability();
     while (random_numbers[random_number_index] <= cumulative_probability) {
       random_number_index += 1;
       assigned += 1;
       if (random_number_index >= number) {
-        i = structures_size_;
         break;
       }
     }
