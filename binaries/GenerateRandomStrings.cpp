@@ -1,7 +1,9 @@
 // GenerateRandomStrings.cpp
 
-#include <string>
 #include <cstdio>
+#include <inttypes.h>
+#include <string>
+
 #include "pcfg.h"
 
 void help() {
@@ -28,7 +30,7 @@ int main(int argc, char *argv[]) {
     std::string structure_file = "grammar/nonterminalRules.txt";
     std::string terminal_folder = "grammar/terminalRules/";
     bool accurate_probabilities = false;
-    uint32_t number = 0;
+    uint64_t number = 0;
 
     // Parse command-line arguments
     if (argc == 1) {
@@ -41,7 +43,11 @@ int main(int argc, char *argv[]) {
         if (commandLineInput.find("-number") == 0) {
             ++i;
             if (i < argc) {
-                sscanf(argv[i], "%i", &number);
+                sscanf(argv[i], "%" SCNu64, &number);
+            }
+            if (number == 0) {
+                fprintf(stderr,
+                       "\nWarning, I was asked to generate 0 passwords\n");
             }
         } else if (commandLineInput.find("-accupr") == 0) {
             accurate_probabilities = true;
@@ -69,7 +75,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "\nNumber: %i\n"
+    fprintf(stderr, "\nNumber: %" PRId64 "\n"
             "Using structure file: %s\n"
             "Using terminal folder: %s\n\n",
             number, structure_file.c_str(), terminal_folder.c_str());
