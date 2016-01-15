@@ -18,7 +18,8 @@ def main(args):
             random_walk_confidence_bound_z_value=args.confidence_bound))
     for row in csv.reader(args.randomfile, delimiter='\t', quotechar=None):
         prob, pwd = row
-        calculator.serialize(pwd, prob)
+        if prob > 0:
+            calculator.serialize(pwd, prob)
     calculator.finish()
 
 if __name__=='__main__':

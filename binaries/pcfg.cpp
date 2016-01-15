@@ -25,6 +25,8 @@
 
 #include "pcfg.h"
 
+int LOGGING_FREQUENCY = 100;
+
 
 // Destructor for PCFG
 // Delete the structures assuming that structures_size_ is accurate
@@ -197,6 +199,7 @@ bool PCFG::generateRandomStrings(const uint64_t number,
 
   uint64_t random_number_index = 0;
   double cumulative_probability = 0;
+  uint64_t structure_logging_freq = structures_size_ / LOGGING_FREQUENCY;
   for (unsigned int i = 0;
        i < structures_size_ && random_number_index < number; ++i) {
     uint64_t assigned = 0;
@@ -207,6 +210,14 @@ bool PCFG::generateRandomStrings(const uint64_t number,
       if (random_number_index >= number) {
         break;
       }
+    }
+    if (i % structure_logging_freq == 0) {
+      fprintf(stderr, "Info: Currently handling structure %u of %u; Generated "
+              "%" PRIu64 " passwords of %" PRIu64 "\n",
+              i, structures_size_, random_number_index, number);
+      // We want the logging to show up immediately and it shouldn't harm
+      // performance too much
+      fflush(stderr);
     }
     if (accurate_probabilities) {
       if (!structures_[i].generateRandomStrings(assigned,
