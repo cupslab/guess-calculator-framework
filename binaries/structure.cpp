@@ -405,7 +405,7 @@ bool Structure::generateRandomStrings(const uint64_t number,
       cumulative_probability += probability;
       while (random_numbers[random_number_index] <= cumulative_probability) {
         // Output this random password to stdout
-        printf("%a\t%s\n", probability, current_string.c_str());
+        printf("%a\t%s\n", probability * probability_, current_string.c_str());
         random_number_index += 1;
         if (random_number_index >= number) {
           strings_left = false;
