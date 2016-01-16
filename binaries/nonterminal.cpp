@@ -392,7 +392,8 @@ std::string Nonterminal::produceRandomStringOfGroup
   TerminalGroup* group = terminal_groups_[group_index];
   group->countStrings(size);
   // Go to size minus one because distribution has inclusive bounds
-  std::uniform_int_distribution<uint64_t> distribution(0, mpz_get_ui(size) - 1);
+  uint64_t limit = mpz_get_ui(size) - 1;
+  std::uniform_int_distribution<uint64_t> distribution(0, limit);
   mpz_clear(size);
   uint64_t random_item = distribution(generator);
 
@@ -400,12 +401,13 @@ std::string Nonterminal::produceRandomStringOfGroup
   std::string answer = "";
   TerminalGroup::TerminalGroupStringIterator* iterator =
     group->getStringIterator();
-  while(iterator->increment()) {
+  while(!iterator->isEnd()) {
     if (counter == random_item) {
       answer = iterator->getCurrentString();
       break;
     }
     counter += 1;
+    iterator->increment()
   }
   delete iterator;
   if (counter != random_item) {
