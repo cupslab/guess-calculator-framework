@@ -14,15 +14,16 @@
 // See header file for additional information
 
 // Includes not covered in header file
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
+#include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <inttypes.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "grammar_tools.h"
 #include "seen_terminal_group.h"
@@ -386,8 +387,35 @@ uint64_t Nonterminal::produceRandomTerminalGroup(std::mt19937 generator) const {
 
 std::string Nonterminal::produceRandomStringOfGroup
 (uint64_t group_index, std::mt19937 generator) const {
-  // For now this is random enough...
-  return getFirstStringOfGroup(group_index);
+  mpz_t size;
+  mpz_init(size);
+  TerminalGroup* group = terminal_groups_[group_index];
+  group->countStrings(size);
+  // Go to size minus one because distribution has inclusive bounds
+  std::uniform_int_distribution<uint64_t> distribution(0, mpz_get_ui(size) - 1);
+  mpz_clear(size);
+  uint64_t random_item = distribution(generator);
+
+  uint64_t counter = 0;
+  std::string answer = "";
+  TerminalGroup::TerminalGroupStringIterator* iterator =
+    group->getStringIterator();
+  while(iterator->increment()) {
+    if (counter == random_item) {
+      answer = iterator->getCurrentString();
+      break;
+    }
+    counter += 1;
+  }
+  delete iterator;
+  if (counter != random_item) {
+    fprintf(stderr, "Error, Incorrect randomness in"
+            " Nonterminal::produceRandomStringOfGroup?!?!?! "
+            "Grammar directory is corrupt. Generated random string %" PRIu64
+            " but saw only %" PRIu64 " elements. Returning empty string.\n",
+            random_item, counter);
+  }
+  return answer;
 }
 
 
