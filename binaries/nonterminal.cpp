@@ -403,13 +403,14 @@ std::string Nonterminal::produceRandomStringOfGroup
   std::string answer = "";
   TerminalGroup::TerminalGroupStringIterator* iterator =
     group->getStringIterator();
-  while(!iterator->isEnd()) {
+  bool more_strings = true;
+  while(more_strings) {
     if (counter == random_item) {
       answer = iterator->getCurrentString();
       break;
     }
     counter += 1;
-    iterator->increment();
+    more_strings = iterator->increment();
   }
   delete iterator;
   if (counter != random_item) {
