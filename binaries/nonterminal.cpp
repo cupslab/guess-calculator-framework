@@ -407,7 +407,7 @@ std::string Nonterminal::produceRandomStringOfGroup
       break;
     }
     counter += 1;
-    iterator->increment()
+    iterator->increment();
   }
   delete iterator;
   if (counter != random_item) {
