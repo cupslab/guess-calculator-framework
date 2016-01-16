@@ -397,6 +397,7 @@ std::string Nonterminal::produceRandomStringOfGroup
   mpz_clear(size);
   uint64_t random_item = distribution(generator);
 
+
   uint64_t counter = 0;
   std::string answer = "";
   TerminalGroup::TerminalGroupStringIterator* iterator =
@@ -409,6 +410,9 @@ std::string Nonterminal::produceRandomStringOfGroup
     counter += 1;
     iterator->increment();
   }
+  fprintf(stderr, "Debug: group %" PRIu64 " item %" PRIu64 " size "
+          "%" PRIu64 " counter %" PRIu64 "\n",
+          group_index, random_item, limit, counter);
   delete iterator;
   if (counter != random_item) {
     fprintf(stderr, "Error, Incorrect randomness in"
