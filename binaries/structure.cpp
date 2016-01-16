@@ -315,7 +315,8 @@ bool Structure::generateStrings(
 // PCFG. This method is designed to be used with Monte Carlo methods for guess
 // number calculation.
 bool Structure::generateRandomStrings(const uint64_t number,
-                                      std::mt19937& generator) const {
+                                      std::mt19937& generator,
+                                      const bool generate_patterns) const {
   for (unsigned int i = 0; i < number; i++) {
     std::string password = "";
     double probability = probability_;
@@ -324,8 +325,12 @@ bool Structure::generateRandomStrings(const uint64_t number,
       uint64_t terminal_group =
         nonterminal->produceRandomTerminalGroup(generator);
       probability *= nonterminal->getProbabilityOfGroup(terminal_group);
-      password.append
-        (nonterminal->produceRandomStringOfGroup(terminal_group, generator));
+      if (generate_patterns) {
+        password.append(nonterminal->getFirstStringOfGroup(terminal_group));
+      } else {
+        password.append
+          (nonterminal->produceRandomStringOfGroup(terminal_group, generator));
+      }
     }
     printf("%a\t%s\n", probability, password.c_str());
   }

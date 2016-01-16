@@ -13,6 +13,8 @@ void help() {
            "                        cutoff\n"
            "Usage Info\n"
            "\tOptions\n"
+           "\t-p (Optional): Generate random patterns. This is more efficient but is not \n"
+           "\t\tsuitable if you actually need strings. \n"
            "\t-number <integer>: Generate number of passwords\n"
            "\t\t summing over all tokenizations  (note this is not needed if you have\n"
            "\t\ttokenized by character class because there is only one tokenization\n"
@@ -29,6 +31,7 @@ int main(int argc, char *argv[]) {
     std::string structure_file = "grammar/nonterminalRules.txt";
     std::string terminal_folder = "grammar/terminalRules/";
     uint64_t number = 0;
+    bool generate_patterns = false;
 
     // Parse command-line arguments
     if (argc == 1) {
@@ -47,6 +50,8 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr,
                        "\nWarning, I was asked to generate 0 passwords\n");
             }
+        } else if (commandLineInput.find("-p")) {
+            generate_patterns = true;
         } else if (commandLineInput.find("-sfile") == 0) {
             ++i;
             if (i < argc)
@@ -82,7 +87,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "done!\n");
 
     fprintf(stderr, "Begin generating strings...\n");
-    if (pcfg.generateRandomStrings(number))
+    if (pcfg.generateRandomStrings(number, generate_patterns))
         fprintf(stderr, "done!\n");
     else {
         fprintf(stderr, "\nError while generating strings!\n");

@@ -30,7 +30,6 @@
 #include "lookup_data.h"
 #include "nonterminal.h"
 #include "nonterminal_collection.h"
-#include "pattern_manager.h"
 #include "pcfg.h"
 
 // Forward declare class because we have circular includes to make generateStrings
@@ -75,9 +74,11 @@ public:
   // Mersenne twister engine is used for random numbers here because they
   // should create the same numbers on different systems, and because they are
   // fast. It would be good to use an abstract random number engine here if
-  // possible.
+  // possible. Be sure to pass the engine by reference otherwise you will get
+  // weird random number bugs.
   bool generateRandomStrings(const uint64_t number,
-                             std::mt19937& generator) const;
+                             std::mt19937& generator,
+                             const bool generate_patterns) const;
 
   std::string
     convertStringToStructureRepresentation(const std::string& inputstring) const;

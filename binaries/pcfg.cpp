@@ -183,7 +183,8 @@ bool PCFG::generateStrings(const double cutoff,
 }
 
 
-bool PCFG::generateRandomStrings(const uint64_t number) const {
+bool PCFG::generateRandomStrings(const uint64_t number,
+                                 const bool generate_patterns) const {
 
   // Create a random number generator and distribution
   // Replace rd() with a static seed if desired
@@ -218,7 +219,8 @@ bool PCFG::generateRandomStrings(const uint64_t number) const {
       // performance too much
       fflush(stderr);
     }
-    if (!structures_[i].generateRandomStrings(assigned, mt_random_generator))
+    if (!structures_[i].generateRandomStrings
+        (assigned, mt_random_generator, generate_patterns))
       return false;
   }
   if (random_number_index < number) {
