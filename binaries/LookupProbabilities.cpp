@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     std::string structure_file;
     std::string terminal_folder;
     std::string password_file;
-    std::string grammar_dir;
+    std::string grammar_dir = "grammar/";
     if (argc != 5) {
         help();
         return 0;
