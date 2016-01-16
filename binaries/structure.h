@@ -77,7 +77,7 @@ public:
   // fast. It would be good to use an abstract random number engine here if
   // possible.
   bool generateRandomStrings(const uint64_t number,
-                             std::mt19937 generator) const;
+                             std::mt19937& generator) const;
 
   std::string
     convertStringToStructureRepresentation(const std::string& inputstring) const;
