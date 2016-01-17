@@ -197,9 +197,12 @@ bool PCFG::generateRandomStrings(const uint64_t number,
   }
   std::sort(random_numbers.begin(), random_numbers.end());
 
+  uint64_t structure_logging_freq = structures_size_ / LOGGING_FREQUENCY;
+
+  // We generate one random number for each password that we need to create.
+  // Then we see which structure they land on.
   uint64_t random_number_index = 0;
   double cumulative_probability = 0;
-  uint64_t structure_logging_freq = structures_size_ / LOGGING_FREQUENCY;
   for (unsigned int i = 0;
        i < structures_size_ && random_number_index < number; ++i) {
     uint64_t assigned = 0;
@@ -220,7 +223,7 @@ bool PCFG::generateRandomStrings(const uint64_t number,
       fflush(stderr);
     }
     if (!structures_[i].generateRandomStrings
-        (assigned, mt_random_generator, generate_patterns))
+        (assigned, &mt_random_generator, generate_patterns))
       return false;
   }
   if (random_number_index < number) {

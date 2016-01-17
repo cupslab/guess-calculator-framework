@@ -358,9 +358,9 @@ std::string Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
 
 
 uint64_t Nonterminal::produceRandomTerminalGroup
-(std::mt19937& generator) const {
+(std::mt19937* generator) const {
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
-  double prob = distribution(generator);
+  double prob = distribution(*generator);
   for (uint64_t i = 0; i < terminal_groups_size_; i++) {
     mpz_t strings_in_group;
     mpf_t strings_in_group_f;
@@ -387,7 +387,7 @@ uint64_t Nonterminal::produceRandomTerminalGroup
 
 
 std::string Nonterminal::produceRandomStringOfGroup
-(uint64_t group_index, std::mt19937& generator) const {
+(uint64_t group_index, std::mt19937* generator) const {
   mpz_t size;
   mpz_init(size);
   TerminalGroup* group = terminal_groups_[group_index];
@@ -396,7 +396,7 @@ std::string Nonterminal::produceRandomStringOfGroup
   uint64_t limit = mpz_get_ui(size) - 1;
   std::uniform_int_distribution<uint64_t> distribution(0, limit);
   mpz_clear(size);
-  uint64_t random_item = distribution(generator);
+  uint64_t random_item = distribution(*generator);
 
 
   uint64_t counter = 0;

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CORES=50
+CORES=60
 NUM=$1
 WORKDIR="workdir"
 time seq 1 $CORES | parallel --results "$WORKDIR" \

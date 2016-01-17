@@ -80,6 +80,11 @@ int main(int argc, char *argv[]) {
             "Using structure file: %s\n"
             "Using terminal folder: %s\n\n",
             number, structure_file.c_str(), terminal_folder.c_str());
+    if (generate_patterns) {
+        fprintf(stderr, "Generating patterns\n");
+    } else {
+        fprintf(stderr, "Generating strings\n");
+    }
 
     PCFG pcfg;
     fprintf(stderr, "Begin loading PCFG specification...");

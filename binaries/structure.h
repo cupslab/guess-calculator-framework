@@ -77,7 +77,7 @@ public:
   // possible. Be sure to pass the engine by reference otherwise you will get
   // weird random number bugs.
   bool generateRandomStrings(const uint64_t number,
-                             std::mt19937& generator,
+                             std::mt19937* generator,
                              const bool generate_patterns) const;
 
   std::string
