@@ -5,6 +5,7 @@
 #include <string>
 
 #include "pcfg.h"
+#include "randomness.h"
 
 void help() {
     printf("\n"
@@ -22,6 +23,7 @@ void help() {
            "\t-sfile <filename>: (optional) Use the following file as the structure file\n"
            "\t-tfolder <path>: (optional) Use the following folder as the terminals folder\n"
            "\t\tThis folder MUST end in \"/\"\n"
+           "\t-seed (Optional): Seed the random number generator\n"
            "\n\n\n");
     return;
 }
@@ -31,6 +33,8 @@ int main(int argc, char *argv[]) {
     std::string structure_file = "grammar/nonterminalRules.txt";
     std::string terminal_folder = "grammar/terminalRules/";
     uint64_t number = 0;
+    uint64_t seed = 0;
+    bool passed_seed = false;
     bool generate_patterns = false;
 
     // Parse command-line arguments
@@ -45,6 +49,10 @@ int main(int argc, char *argv[]) {
             ++i;
             if (i < argc) {
                 sscanf(argv[i], "%" SCNu64, &number);
+            } else {
+                fprintf(stderr, "\nError no number after -number option\n");
+                help();
+                return 1;
             }
             if (number == 0) {
                 fprintf(stderr,
@@ -52,6 +60,16 @@ int main(int argc, char *argv[]) {
             }
         } else if (commandLineInput.find("-p") == 0) {
             generate_patterns = true;
+        } else if (commandLineInput.find("-seed") == 0) {
+            ++i;
+            if (i < argc) {
+                sscanf(argv[i], "%" SCNu64, &seed);
+                passed_seed = true;
+            } else {
+                fprintf(stderr, "\nError no number after -seed option\n");
+                help();
+                return 1;
+            }
         } else if (commandLineInput.find("-sfile") == 0) {
             ++i;
             if (i < argc)
@@ -92,9 +110,20 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "done!\n");
 
     fprintf(stderr, "Begin generating strings...\n");
-    if (pcfg.generateRandomStrings(number, generate_patterns))
+
+    if (passed_seed) {
+        fprintf(stderr, "Using seed %" PRIu64 "\n", seed);
+    } else {
+        std::random_device rd;
+        seed = rd();
+        fprintf(stderr, "Using randomly generated seed %" PRIu64 "\n", seed);
+    }
+    RNG mt_random_generator(seed);
+
+    if (pcfg.generateRandomStrings
+        (number, generate_patterns, &mt_random_generator)) {
         fprintf(stderr, "done!\n");
-    else {
+    } else {
         fprintf(stderr, "\nError while generating strings!\n");
         return 1;
     }

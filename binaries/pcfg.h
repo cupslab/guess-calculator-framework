@@ -42,9 +42,10 @@
 #include <cstdint>
 
 #include "gcfmacros.h"
-#include "structure.h"
-#include "nonterminal_collection.h"
 #include "lookup_data.h"
+#include "nonterminal_collection.h"
+#include "randomness.h"
+#include "structure.h"
 
 // Forward declare class because we have circular includes
 class Structure;
@@ -78,7 +79,8 @@ class PCFG {
   bool generateStrings(const double cutoff,
                        const bool accurate_probabilities = false) const;
   bool generateRandomStrings(const uint64_t number,
-                             const bool generate_patterns) const;
+                             const bool generate_patterns,
+                             RNG* generator) const;
 
   // Run lookups for each structure in the grammar and return a LookupData
   // struct with the "best" lookup (highest probability / summed probabilities)

@@ -19,10 +19,8 @@
 #include <cstdlib>
 #include <errno.h>
 #include <inttypes.h>
-#include <random>
 
 #include "grammar_tools.h"
-
 #include "pcfg.h"
 
 int LOGGING_FREQUENCY = 100;
@@ -184,16 +182,13 @@ bool PCFG::generateStrings(const double cutoff,
 
 
 bool PCFG::generateRandomStrings(const uint64_t number,
-                                 const bool generate_patterns) const {
+                                 const bool generate_patterns,
+                                 RNG* generator) const {
 
-  // Create a random number generator and distribution
-  // Replace rd() with a static seed if desired
-  std::random_device rd;
-  std::mt19937 mt_random_generator(rd());
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
   std::vector<double> random_numbers(number);
   for (uint64_t i = 0; i < number; i++) {
-    random_numbers[i] = distribution(mt_random_generator);
+    random_numbers[i] = distribution(*generator);
   }
   std::sort(random_numbers.begin(), random_numbers.end());
 
@@ -223,7 +218,7 @@ bool PCFG::generateRandomStrings(const uint64_t number,
       fflush(stderr);
     }
     if (!structures_[i].generateRandomStrings
-        (assigned, &mt_random_generator, generate_patterns))
+        (assigned, generator, generate_patterns))
       return false;
   }
   if (random_number_index < number) {

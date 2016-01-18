@@ -315,7 +315,7 @@ bool Structure::generateStrings(
 // PCFG. This method is designed to be used with Monte Carlo methods for guess
 // number calculation.
 bool Structure::generateRandomStrings(const uint64_t number,
-                                      std::mt19937* generator,
+                                      RNG* generator,
                                       const bool generate_patterns) const {
   for (unsigned int i = 0; i < number; i++) {
     std::string password = "";

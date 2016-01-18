@@ -40,12 +40,12 @@
 
 #include <cstdint>
 #include <gmp.h>
-#include <random>
 #include <string>
 
 #include "gcfmacros.h"
 #include "terminal_group.h"
 #include "lookup_data.h"
+#include "randomness.h"
 
 class Nonterminal {
 public:
@@ -76,10 +76,10 @@ public:
   // Returns a random terminal group according to the probability of each
   // group. Returns the group id of the selected group. It uses the passed
   // generator for randomness.
-  uint64_t produceRandomTerminalGroup(std::mt19937* generator) const;
+  uint64_t produceRandomTerminalGroup(RNG* generator) const;
 
   std::string produceRandomStringOfGroup
-    (uint64_t group_index, std::mt19937* generator) const;
+    (uint64_t group_index, RNG* generator) const;
 
   // Routines for getting values from the terminal groups
   std::string getFirstStringOfGroup(uint64_t group_index) const;

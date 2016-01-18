@@ -24,13 +24,13 @@
 #include <gmp.h>
 #include <string>
 #include <cstdint>
-#include <random>
 
 #include "gcfmacros.h"
 #include "lookup_data.h"
 #include "nonterminal.h"
 #include "nonterminal_collection.h"
 #include "pcfg.h"
+#include "randomness.h"
 
 // Forward declare class because we have circular includes to make generateStrings
 // work (it needs to query the parent PCFG for each string if we want accurate
@@ -70,14 +70,8 @@ public:
                        const bool accurate_probabilities = false,
                        const PCFG* parent = NULL) const;
 
-
-  // Mersenne twister engine is used for random numbers here because they
-  // should create the same numbers on different systems, and because they are
-  // fast. It would be good to use an abstract random number engine here if
-  // possible. Be sure to pass the engine by reference otherwise you will get
-  // weird random number bugs.
   bool generateRandomStrings(const uint64_t number,
-                             std::mt19937* generator,
+                             RNG* generator,
                              const bool generate_patterns) const;
 
   std::string
