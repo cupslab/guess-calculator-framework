@@ -317,7 +317,7 @@ bool Structure::generateStrings(
 bool Structure::generateRandomStrings(const uint64_t number,
                                       RNG* generator,
                                       const bool generate_patterns) const {
-  for (unsigned int i = 0; i < number; i++) {
+  for (uint64_t i = 0; i < number; i++) {
     std::string password = "";
     double probability = probability_;
     for (unsigned int j = 0; j < nonterminals_size_; j++) {
