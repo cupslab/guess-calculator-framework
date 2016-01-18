@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr,
                        "\nWarning, I was asked to generate 0 passwords\n");
             }
-        } else if (commandLineInput.find("-p")) {
+        } else if (commandLineInput.find("-p") == 0) {
             generate_patterns = true;
         } else if (commandLineInput.find("-sfile") == 0) {
             ++i;
