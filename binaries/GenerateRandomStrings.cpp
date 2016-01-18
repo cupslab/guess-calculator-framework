@@ -116,16 +116,8 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Using seed %" PRIu64 "\n", seed);
   } else {
     std::random_device rd;
-    if (rd.max() < std::numeric_limits<uint64_t>::max()) {
-      // Random device typically returns 32 bits on most systems. We want 64
-      // bits of randomness. Here we call it twice to get 64 bits of
-      // randomness.
-      // 8 is the number of places in a byte
-      uint64_t temp = rd();
-      seed = (temp << (1 << (sizeof(unsigned int) * 8))) | rd();
-    } else {
-      seed = rd();
-    }
+    std::uniform_int_distribution<uint64_t> seed_distribution;
+    seed = seed_distribution(rd);
     fprintf(stderr, "Using randomly generated seed %" PRIu64 "\n", seed);
   }
   RNG mt_random_generator(seed);
