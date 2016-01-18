@@ -121,7 +121,8 @@ int main(int argc, char *argv[]) {
       // bits of randomness. Here we call it twice to get 64 bits of
       // randomness.
       // 8 is the number of places in a byte
-      seed = (rd() << (1 << (sizeof(unsigned int) * 8))) | rd();
+      uint64_t temp = rd();
+      seed = (temp << (1 << (sizeof(unsigned int) * 8))) | rd();
     } else {
       seed = rd();
     }
