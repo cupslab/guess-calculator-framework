@@ -361,19 +361,28 @@ uint64_t Nonterminal::produceRandomTerminalGroup
 (RNG* generator) const {
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
   double prob = distribution(*generator);
+
   mpz_t strings_in_group;
   mpf_t strings_in_group_f;
   mpf_t prob_in_group;
   mpz_init(strings_in_group);
   mpf_init(strings_in_group_f);
   mpf_init(prob_in_group);
+
   uint64_t i = 0;
   for (; i < terminal_groups_size_; i++) {
+    // We need to multiply the probability of this group by the number of
+    // strings in the group to get the cumulative probability of the random
+    // number landing in this group.
     mpf_set_d(prob_in_group, getProbabilityOfGroup(i));
     countStringsOfGroup(strings_in_group, i);
     mpf_set_z(strings_in_group_f, strings_in_group);
+
+    // Multiply the probability of this group by the number of strings in the
+    // group and store the answer in prob_in_group.
     mpf_mul(prob_in_group, prob_in_group, strings_in_group_f);
     prob -= mpf_get_d(prob_in_group);
+
     if (prob < 0) {
       break;
     }
@@ -391,6 +400,8 @@ uint64_t Nonterminal::produceRandomTerminalGroup
 }
 
 
+// Because this function has to hit the disk, its quite expensive for large
+// grammars. Especially if in the middle of a loop.
 std::string Nonterminal::produceRandomStringOfGroup
 (uint64_t group_index, RNG* generator) const {
   mpz_t size;

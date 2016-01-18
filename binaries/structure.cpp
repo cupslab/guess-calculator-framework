@@ -317,6 +317,14 @@ bool Structure::generateStrings(
 bool Structure::generateRandomStrings(const uint64_t number,
                                       RNG* generator,
                                       const bool generate_patterns) const {
+
+  // For each password to generate, we need to assign a random terminal to each
+  // nonterminal location. For example for the `LLDD' structure, one assignment
+  // would be `aa11'. However, generating a random string is a very expensive
+  // operation. So, instead if generate_patterns is true, this code will
+  // generate patterns instead of strings. This comes at no loss of precision
+  // for the probability since all patterns have the same probability, but does
+  // mean that the strings are not random.
   for (uint64_t i = 0; i < number; i++) {
     std::string password = "";
     double probability = probability_;
@@ -325,6 +333,7 @@ bool Structure::generateRandomStrings(const uint64_t number,
       uint64_t terminal_group =
         nonterminal->produceRandomTerminalGroup(generator);
       probability *= nonterminal->getProbabilityOfGroup(terminal_group);
+
       if (generate_patterns) {
         password.append(nonterminal->getFirstStringOfGroup(terminal_group));
       } else {

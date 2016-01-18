@@ -185,11 +185,14 @@ bool PCFG::generateRandomStrings(const uint64_t number,
                                  const bool generate_patterns,
                                  RNG* generator) const {
 
+  // Generate number random probabilities between 0 and 1 (exclusive).
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
   std::vector<double> random_numbers(number);
   for (uint64_t i = 0; i < number; i++) {
     random_numbers[i] = distribution(*generator);
   }
+
+  // We sort them so we only have to make one comparison per number.
   std::sort(random_numbers.begin(), random_numbers.end());
 
   uint64_t structure_logging_freq = structures_size_ / LOGGING_FREQUENCY;
@@ -202,6 +205,8 @@ bool PCFG::generateRandomStrings(const uint64_t number,
        i < structures_size_ && random_number_index < number; ++i) {
     uint64_t assigned = 0;
     cumulative_probability += structures_[i].getProbability();
+
+    // In this loop we calculate how many passwords fell into this structure.
     while (random_numbers[random_number_index] <= cumulative_probability) {
       random_number_index += 1;
       assigned += 1;
@@ -209,6 +214,8 @@ bool PCFG::generateRandomStrings(const uint64_t number,
         break;
       }
     }
+
+    // Print out some logging information
     if (i % structure_logging_freq == 0) {
       fprintf(stderr, "Info: Currently handling structure %u of %u; Generated "
               "%" PRIu64 " passwords of %" PRIu64 "\n",
@@ -217,10 +224,14 @@ bool PCFG::generateRandomStrings(const uint64_t number,
       // performance too much
       fflush(stderr);
     }
+
+    // Ask this structure to generate its assigned number of random strings.
     if (!structures_[i].generateRandomStrings
         (assigned, generator, generate_patterns))
       return false;
   }
+
+  // If we haven't finished all the passwords, then something went wrong.
   if (random_number_index < number) {
     fprintf(stderr,
             "Error: Random string generation did not produce as many strings as"
