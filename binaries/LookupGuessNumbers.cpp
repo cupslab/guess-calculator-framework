@@ -159,6 +159,14 @@ int main(int argc, char *argv[]) {
   pcfg.loadGrammar(structure_file, terminal_folder);
   fprintf(stderr, "done!\n");
 
+  if (bias_index != 0) {
+    if (bias_index == 1) {
+      fputs("Biasing numbers away from zero\n", stderr);
+    } else {
+      fputs("Biasing numbers toward zero\n", stderr);
+    }
+  }
+
   // Open lookup table for random access
   FILE *lookupFile = fopen(lookup_file.c_str(), "rb");
   if (lookupFile == 0) {
@@ -194,7 +202,7 @@ int main(int argc, char *argv[]) {
         if (bias_index == 0) {
           mpz_add(lookup_data->index, lookup_data->index, table_lookup->index);
         } else if (bias_index == 1) {
-          mpz_set(lookup_data->index, lookup_data->next_index);
+          mpz_set(lookup_data->index, table_lookup->next_index);
         } // else if bias_index == -1 we don't need to do anything else
       } else {
         // If the password was parsed, but not found in the lookup table,
@@ -212,6 +220,7 @@ int main(int argc, char *argv[]) {
         }
       }
       mpz_clear(table_lookup->index);
+      mpz_clear(table_lookup->next_index);
       delete table_lookup;
     } else if ((lookup_data->parse_status & kTerminalCollision) ||
                (lookup_data->parse_status & kUnexpectedFailure)) {
