@@ -444,7 +444,7 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
     if (patternkey == pattern_string) {
 
       // Read another line to see the next pattern guess number
-      char peek_character = static_cast<char>(fgetc(lookupFile));
+      peek_character = static_cast<char>(fgetc(lookupFile));
       if (peek_character != 'T') {
         fseeko(lookupFile, -1, SEEK_CUR);
         if (!ReadLookupTableLine(lookupFile, next_probability,
@@ -452,7 +452,7 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
           fprintf(stderr, "Unable to parse values from line in lookup table file!\n");
           exit(EXIT_FAILURE);
         }
-        mpz_set_str(lookup_data->next_index, next_pattern.c_str(), 10);
+        mpz_set_str(lookup_data->next_index, next_guess_number.c_str(), 10);
       }
 
       // Found match!
