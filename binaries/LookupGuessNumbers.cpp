@@ -95,11 +95,6 @@ int main(int argc, char *argv[]) {
   // -1 means bias towards 0, 1 means bias away from 0, 0 means no bias
   int bias_index = 0;
 
-  // Parse command-line arguments
-  if (argc != 5 && argc != 7) {
-    help();
-    return 0;
-  }
   for (int i = 1; i < argc; ++i) {
     std::string commandLineInput = argv[i];
     if (commandLineInput.find("-pfile") == 0) {
