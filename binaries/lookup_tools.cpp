@@ -406,6 +406,7 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
                         const std::string& patternkey) {
   LookupData *lookup_data = new LookupData;
   mpz_init_set_si(lookup_data->index, -1);
+  mpz_init_set_si(lookup_data->next_index, -1);
 
   // If the probability is lower than anything in the lookup table, return
   static double lowest_probability = FindLastProbability(lookupFile);
@@ -425,7 +426,8 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
   // Now check for the pattern key among the matching lines -- there can be
   // multiple patterns with the same probability
   double read_probability = probability;
-  std::string guess_number, pattern_string;
+  double next_probability = probability;
+  std::string guess_number, pattern_string, next_pattern, next_guess_number;
   while (read_probability == probability) {
     // Guard against reading the "Total count" line
     char peek_character = static_cast<char>(fgetc(lookupFile));
@@ -438,7 +440,21 @@ LookupData *TableLookup(FILE *lookupFile, const double probability,
       fprintf(stderr, "Unable to parse values from line in lookup table file!\n");
       exit(EXIT_FAILURE);
     }
+
     if (patternkey == pattern_string) {
+
+      // Read another line to see the next pattern guess number
+      char peek_character = static_cast<char>(fgetc(lookupFile));
+      if (peek_character != 'T') {
+        fseeko(lookupFile, -1, SEEK_CUR);
+        if (!ReadLookupTableLine(lookupFile, next_probability,
+                                 next_guess_number, next_pattern)) {
+          fprintf(stderr, "Unable to parse values from line in lookup table file!\n");
+          exit(EXIT_FAILURE);
+        }
+        mpz_set_str(lookup_data->next_index, next_pattern.c_str(), 10);
+      }
+
       // Found match!
       mpz_set_str(lookup_data->index, guess_number.c_str(), 10);
       lookup_data->parse_status = kCanParse;

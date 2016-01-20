@@ -11,10 +11,13 @@ except ImportError as e:
     sys.exit(1)
 
 def main(args):
+    input_probs = []
+    for pwd, prob in csv.reader(args.testfile, delimiter='\t', quotechar=None):
+        prob_v = float.fromhex(prob)
+        if prob_v < 1 and prob_v >= 0:
+            input_probs.append( (pwd, prob_v) )
     calculator = pwd_guess.DelAmicoCalculator(
-        args.ofile,
-        [(pwd, float.fromhex(prob)) for prob, pwd in
-         csv.reader(args.testfile, delimiter='\t', quotechar=None)],
+        args.ofile, input_probs,
         pwd_guess.ModelDefaults(
             random_walk_confidence_bound_z_value=args.confidence_interval))
     for row in csv.reader(args.randomfile, delimiter='\t', quotechar=None):
@@ -22,6 +25,8 @@ def main(args):
         prob = float.fromhex(prob_str)
         if prob >= 0:
             calculator.serialize(pwd, prob)
+        if prob >= 1:
+            calculator.serialize(pwd, 0)
     calculator.finish()
 
 if __name__=='__main__':

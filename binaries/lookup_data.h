@@ -45,6 +45,7 @@ struct LookupData {
     ParseStatus parse_status;
     double probability;
     mpz_t index;
+    mpz_t next_index;           /* This is not always set! */
     std::unordered_set<std::string> source_ids;
     std::string first_string_of_pattern;
 };

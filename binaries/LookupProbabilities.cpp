@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   std::string terminal_folder;
   std::string password_file;
   std::string grammar_dir = "grammar/";
-  if (argc != 5) {
+  if (argc != 3 || argc != 5) {
     help();
     return 0;
   }
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
               static_cast<unsigned>(lookup_data->parse_status));
       exit(EXIT_FAILURE);
     } else {
-      probability = static_cast<double>(lookup_data->parse_status);
+      probability = static_cast<double>(-(lookup_data->parse_status));
     }
 
     // Print all of the source ids that went into this guess

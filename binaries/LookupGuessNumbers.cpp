@@ -71,6 +71,8 @@ void help() {
     "\t-lfile <filename>: a lookup table file in sorted, aggregrated-count format\n"
     "\tOptional Options:\n"
     "\t-gdir <directory>: a \"grammar directory\" produced by the calculator\n"
+    "\t-bias-up (Optional): bias the guess numbers toward 0 on probability tie\n"
+    "\t-bias-down (Optional): bias the guess numbers away from 0 on probability tie\n"
     "\n\n\n");
   return;
 }
@@ -84,6 +86,14 @@ int main(int argc, char *argv[]) {
   std::string password_file;
   std::string lookup_file;
   std::string grammar_dir;
+
+  // This value controls what lookup numbers are printed when there are ties in
+  // probability (ie. two guesses have the same probability). By default we
+  // return an exact value, meaning a model would actually make that many
+  // guesses. We can optionally bias away from 0 (optimistic) or away from 0
+  // (pessimistic).
+  // -1 means bias towards 0, 1 means bias away from 0, 0 means no bias
+  int bias_index = 0;
 
   // Parse command-line arguments
   if (argc != 5 && argc != 7) {
@@ -125,6 +135,10 @@ int main(int argc, char *argv[]) {
         help();
         return 1;
       }
+    } else if (commandLineInput.find("-bias-up") == 0) {
+      bias_index = 1;
+    } else if (commandLineInput.find("-bias-down") == 0) {
+      bias_index = -1;
     }
   }
   if (password_file == "" || lookup_file == "") {
@@ -182,7 +196,11 @@ int main(int argc, char *argv[]) {
       if (table_lookup->parse_status & kCanParse) {
         // Password was found!  Add the value in the lookup table to the
         // rank of the password in its pattern
-        mpz_add(lookup_data->index, lookup_data->index, table_lookup->index);
+        if (bias_index == 0) {
+          mpz_add(lookup_data->index, lookup_data->index, table_lookup->index);
+        } else if (bias_index == 1) {
+          mpz_set(lookup_data->index, lookup_data->next_index);
+        } // else if bias_index == -1 we don't need to do anything else
       } else {
         // If the password was parsed, but not found in the lookup table,
         // the only acceptable reason for is kBeyondCutoff
