@@ -203,7 +203,9 @@ int main(int argc, char *argv[]) {
           mpz_add(lookup_data->index, lookup_data->index, table_lookup->index);
         } else if (bias_index == 1) {
           mpz_set(lookup_data->index, table_lookup->next_index);
-        } // else if bias_index == -1 we don't need to do anything else
+        } else {
+          mpz_set(lookup_data->index, table_lookup->index);
+        }
       } else {
         // If the password was parsed, but not found in the lookup table,
         // the only acceptable reason for is kBeyondCutoff
