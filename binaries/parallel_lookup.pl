@@ -29,9 +29,9 @@ sub print_usage {
   $0 [-h][-p][-D] -n ? -L file1 -I file5
 
   this script requires several arguments:
-    -L lookup_table_file 
+    -L lookup_table_file
     -I input_passwords_file  absolute path to file containing passwords to be looked up, in three-column lookup format
-    -n # set the number of cores to utilize 
+    -n # set the number of cores to utilize
 
   This script also requires that LookupGuessNumbers, lookup file, and grammar directories be in the current directory!
 
@@ -59,7 +59,7 @@ my $options = {
   deleteMode  => 1
 };
 my %opts;
-getopts('L:I:hpD:n:', \%opts);
+getopts('L:I:hpubD:n:', \%opts);
 
 # Check that required arguments are specified and that files exist
 print_usage() if defined $opts{h};
@@ -92,6 +92,8 @@ foreach my $optarg (@optArguments) {
 # Set config variables for those options which have no associated value or when we want to store that a value was specified (as in number of cores)
 my @optBooleans = (
   [qw/p shouldSplit 0/],
+  [qw/u biasUp 0/],
+  [qw/b biasDown 0/],
   [qw/D deleteMode 0/]
 );
 foreach my $optbool (@optBooleans) {
@@ -128,12 +130,12 @@ my $prochandler = ProcessHandler->new();
 $SIG{CHLD} = sub { $prochandler->REAPER() };
 
 # On SIGINT or SIGTERM, kill all subprocesses and exit
-$SIG{INT} = \&tree_killer; 
+$SIG{INT} = \&tree_killer;
 $SIG{TERM} = \&tree_killer;
-sub tree_killer { 
+sub tree_killer {
   print STDERR "Caught SIGINT or SIGTERM! Killing all subprocesses and aborting!\n";
-  $prochandler->killAll(); 
-  exit(1); 
+  $prochandler->killAll();
+  exit(1);
 }
 
 # Finally, kill child processes on termination (die or exit) lest they continue to fill the disk
@@ -179,9 +181,19 @@ print STDERR "there are " . scalar(@splitfiles) . " files to process\n";
 print STDERR "    =======processing (<= $options->{cores} processes) =====\n";
 my $start_lookup = time();
 
+my $binaryArguments = "";
+if ($options->{biasUp}) {
+    $binaryArguments = " -bias-up ";
+    print STDERR "Biasing output up\n";
+} else if ($options->{biasDown}) {
+    $binaryArguments = " -bias-down ";
+    print STDERR "Biasing output down\n";
+}
+
 my $mockcmd = "./$supportBinaries[0] " .
   "-lfile $options->{lookuptablefile} " .
   "-pfile lookuppieces/tolookup-split.?? " .
+  "$binaryArguments" .
   "> lookuppieces/lookupedresults-split.??";
 print STDERR "executing: '$mockcmd' \n";
 
@@ -217,7 +229,7 @@ for my $i (0 .. (scalar(@splitfiles) - 1)) {
         }
         # If previous command returned successfully, use exec to kill this
         # child without running END block
-        exec $^X => -eexit;      
+        exec $^X => -eexit;
       }
       else {
         die "$infile doesn't exist!\n";

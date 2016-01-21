@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
           mpz_add(lookup_data->index, lookup_data->index, table_lookup->index);
         } else if (bias_index == 1) {
           mpz_set(lookup_data->index, table_lookup->next_index);
-        } else {
+        } else if (bias_index == -1){
           mpz_set(lookup_data->index, table_lookup->index);
         }
       } else {
