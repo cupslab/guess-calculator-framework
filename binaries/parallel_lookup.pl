@@ -223,6 +223,7 @@ for my $i (0 .. (scalar(@splitfiles) - 1)) {
         my $cmd = "./$supportBinaries[0] " .
           "-lfile $options->{lookuptablefile} " .
           "-pfile lookuppieces/$infile " .
+          "$binaryArguments" .
           "> lookuppieces/lookedupresults-$outname";
         print STDERR "In child #" . $i . ": ";
         print STDERR "executing $cmd\n";
