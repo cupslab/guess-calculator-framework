@@ -26,7 +26,7 @@ sub print_usage {
   print STDERR << "EOF";
   parallel lookup script v$VERSION
 
-  $0 [-h][-p][-D] -n ? -L file1 -I file5
+  $0 [-h][-p][-D][-u][-b] -n ? -L file1 -I file5
 
   this script requires several arguments:
     -L lookup_table_file
@@ -38,7 +38,9 @@ sub print_usage {
   there are also several optional arguments:
     -h   this help
     -p   don't split input lookup file (assumes file is already split)
-      -D   don't delete split files at the end
+    -D   don't delete split files at the end
+    -u   bias output guess numbers up (away from 0) on tie
+    -b   bias output guess numbers down (towards 0) on tie
 
   example:
     $0 -n 62 -L lookuptable-1e-15 -I condition-name.test
@@ -185,7 +187,7 @@ my $binaryArguments = "";
 if ($options->{biasUp}) {
     $binaryArguments = " -bias-up ";
     print STDERR "Biasing output up\n";
-} else if ($options->{biasDown}) {
+} elsif ($options->{biasDown}) {
     $binaryArguments = " -bias-down ";
     print STDERR "Biasing output down\n";
 }
