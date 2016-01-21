@@ -58,10 +58,12 @@ EOF
 my $options = {
   cores       => 1,
   shouldSplit => 1,
-  deleteMode  => 1
+  deleteMode  => 1,
+  biasUp      => 0,
+  biasDown    => 0
 };
 my %opts;
-getopts('L:I:hpubD:n:', \%opts);
+getopts('L:I:hpD:ubn:', \%opts);
 
 # Check that required arguments are specified and that files exist
 print_usage() if defined $opts{h};
@@ -94,9 +96,9 @@ foreach my $optarg (@optArguments) {
 # Set config variables for those options which have no associated value or when we want to store that a value was specified (as in number of cores)
 my @optBooleans = (
   [qw/p shouldSplit 0/],
-  [qw/u biasUp 0/],
-  [qw/b biasDown 0/],
-  [qw/D deleteMode 0/]
+  [qw/D deleteMode 0/],
+  [qw/u biasUp 1/],
+  [qw/b biasDown 1/]
 );
 foreach my $optbool (@optBooleans) {
   $options->{ @$optbool[1] } = @$optbool[2] if defined $opts{ @$optbool[0] };
