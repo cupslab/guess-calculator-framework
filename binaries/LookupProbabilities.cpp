@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   std::string terminal_folder;
   std::string password_file;
   std::string grammar_dir = "grammar/";
-  if (argc != 3 || argc != 5) {
+  if (argc != 3 && argc != 5) {
     help();
     return 0;
   }

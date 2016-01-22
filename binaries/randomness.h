@@ -1,5 +1,5 @@
-#ifndef RANDOMNESS_H
-#define RANDOMNESS_H
+#ifndef RANDOMNESS_H__
+#define RANDOMNESS_H__
 
 #include <random>
 
@@ -10,4 +10,4 @@
 // with only 32 bits we might start repeating operations.
 typedef std::mt19937_64 RNG;
 
-#endif
+#endif // RANDOMNESS_H__
