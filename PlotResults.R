@@ -733,6 +733,7 @@ PlotGuessingCurves <- function(lookup.results,
       geom_text(data = maxproportion.data, 
                 aes_string(x = "LabelX", y = "LabelY", label = "condition"), 
                 hjust = 0, vjust = 0.5, lineheight = 0.8,
+                size = 5,  # 5mm = 14pt
                 family = safe.ifelse(kExtraFonts, "Helvetica Neue", "Helvetica"))
   }
 
