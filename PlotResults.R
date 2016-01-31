@@ -639,7 +639,7 @@ PlotGuessingCurves <- function(lookup.results,
                                 y = "proportion", 
                                 color = "condition"))
   plot.plus.curves <- baseplot + 
-    geom_step(size = 1, lineend = "square", linejoin = "mitre", linemitre=2) +  # Use thin step line for data point
+    geom_step(size = 1) +  # Use thin step line for data point
     # geom_point(shape = 1) +  # Overlay each data point with hollowed circle
     # Custom theme for plot - these are settings I think look good
     theme(axis.line = element_line(colour = "black"),
