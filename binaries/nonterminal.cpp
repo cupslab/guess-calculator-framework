@@ -280,7 +280,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
       inputstring_representation.push_back('D');
     else if( inputstring[i] == 1 )
       // If the \x01 character is found, give up
-      return false;
+      return NULL;
     else
       inputstring_representation.push_back('S');
   }
