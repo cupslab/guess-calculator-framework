@@ -220,8 +220,8 @@ void UnseenTerminalGroup::initCharacterLookups() {
     d_int_to_char_[i - '0'] = i;
   }
 
-  for (int i = 0; i < kGeneratorSymbols.size(); ++i)
-    s_char_to_int_[ kGeneratorSymbols[i] ] = i;
+  for (unsigned int i = 0; i < kGeneratorSymbols.size(); ++i)
+    s_char_to_int_[ (unsigned char)kGeneratorSymbols[i] ] = i;
 }
 
 
@@ -265,15 +265,15 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
   for (unsigned int i = 0; i < generator_mask_.size(); ++i) {
     switch (generator_mask_[i]) {
       case 'L':
-        if (l_char_to_int_[ terminal[i] ] == -1)
+        if (l_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       case 'D':
-        if (d_char_to_int_[ terminal[i] ] == -1)
+        if (d_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       case 'S':
-        if (s_char_to_int_[ terminal[i] ] == -1)
+        if (s_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       default:
@@ -316,15 +316,15 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
     switch (generator_mask_[i]) {
       case 'L':
         character_base = 26;
-        character_index = l_char_to_int_[ terminal[i] ];
+        character_index = l_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       case 'D':
         character_base = 10;
-        character_index = d_char_to_int_[ terminal[i] ];
+        character_index = d_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       case 'S':
         character_base = kGeneratorSymbols.size();
-        character_index = s_char_to_int_[ terminal[i] ];
+        character_index = s_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       default:
         fprintf(stderr, "generator_mask_: %s contains unexpected characters "

@@ -42,6 +42,8 @@ Nonterminal::~Nonterminal() {
       delete terminal_groups_[i];
     delete[] terminal_groups_;
   // Unmap the terminal data file
+  // XXXstroucki mmaps disappear on exit, beware that we reuse the
+  // char* now. Better to use a counted type.
   if (terminal_data_ != NULL)
     munmap(terminal_data_, terminal_data_size_);
 }
