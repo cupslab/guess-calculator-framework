@@ -41,6 +41,7 @@
 #include <gmp.h>
 #include <string>
 #include <cstdint>
+#include <unordered_map>
 
 #include "gcfmacros.h"
 #include "terminal_group.h"
@@ -98,6 +99,9 @@ private:
   // Terminals don't use uppercase, so terminal_representation_ won't
   // contain "U" (it is replaced with "L")
   std::string terminal_representation_;  
+
+  static std::unordered_map<std::string, char*> mapped_data_;
+  static std::unordered_map<std::string, size_t> mapped_data_size_;
 
   // Disable copy and assignment
   DISALLOW_COPY_AND_ASSIGN(Nonterminal);

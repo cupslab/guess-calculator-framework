@@ -30,6 +30,8 @@
 
 #include "nonterminal.h"
 
+std::unordered_map<std::string, char *>Nonterminal::mapped_data_;
+std::unordered_map<std::string, size_t>Nonterminal::mapped_data_size_;
 
 // Destructor for Nonterminal -- checks whether variables were initialized 
 // before deleting them
@@ -66,6 +68,8 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
                'U',
                'L');
 
+
+  if (Nonterminal::mapped_data_.count(terminal_representation_) == 0) {
 
   // Open the terminal file with open
   int file_handle;
@@ -112,6 +116,8 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     static_cast<char *>(mmap(static_cast<caddr_t>(0), 
                              terminal_data_size_, 
                              PROT_READ, MAP_SHARED, file_handle, 0));
+  // waste not want not
+  close(file_handle);
   if (static_cast<void *>(terminal_data_) == MAP_FAILED) {
     perror("Error in memory mapping terminal data file: ");
     fprintf(stderr,
@@ -120,7 +126,14 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     return false;
   }
 
-  // With temrinal data initialized, can now initialize terminal groups
+  Nonterminal::mapped_data_.insert({terminal_representation_, terminal_data_});
+  Nonterminal::mapped_data_size_.insert({terminal_representation_, terminal_data_size_});
+  } else {
+    terminal_data_ = Nonterminal::mapped_data_[terminal_representation_];
+    terminal_data_size_ = Nonterminal::mapped_data_size_[terminal_representation_];
+  }
+
+  // With terminal data initialized, can now initialize terminal groups
   if (!initializeTerminalGroups())
     return false;
 
