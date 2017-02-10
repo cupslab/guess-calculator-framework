@@ -19,6 +19,8 @@
 #include <cstring>
 #include <sstream>
 
+#include <unordered_map>
+
 #include "grammar_tools.h"
 
 namespace grammartools {
@@ -73,11 +75,12 @@ bool ReadStructureLine(FILE *fileptr,
                        double& probability,
                        std::string& source_ids) {
   char buf[1024];
+  char *tokstate;
 
   if (fgets(buf, 1024, fileptr) != NULL) {
     // Structure should be the string up to a tab character
     char *structureptr;
-    structureptr = strtok(buf, "\t");
+    structureptr = strtok_r(buf, "\t", &tokstate);
     if (structureptr == NULL) {
       goto error;  // strtok failed!
     } else {
@@ -88,7 +91,7 @@ bool ReadStructureLine(FILE *fileptr,
 
     // Probability will be next
     char *probability_str;
-    probability_str = strtok(NULL, "\t");
+    probability_str = strtok_r(NULL, "\t", &tokstate);
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
@@ -103,7 +106,7 @@ bool ReadStructureLine(FILE *fileptr,
 
     // The remainder of the line will be source ids
     char *sourceidsptr;
-    sourceidsptr = strtok(NULL, "\n");
+    sourceidsptr = strtok_r(NULL, "\n", &tokstate);
     if (sourceidsptr == NULL) {
       goto error;  // strtok failed!
     } else {
@@ -180,6 +183,12 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
   return true;
 }
 
+// out parameter data for nonterminal line
+struct pnldata {
+  std::string terminal;
+  double probability;
+  std::string source_ids;
+};
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
 // out the fields that are returned in the out-parameters.
@@ -191,9 +200,19 @@ bool ParseNonterminalLine(char *source,
                           std::string& terminal, 
                           double& probability,
                           std::string& source_ids) {
+
+  // do not reparse previously seen lines
+  // protect if multithreaded
+  static std::unordered_map<std::string, struct pnldata> map;
+
+  std::string key = source;
+
+  if (map.count(key) == 0) {
   // Tokenize the buffer using strtok
   char *terminalptr;
-  terminalptr = strtok(source, "\t");
+  char *tokstate;
+
+  terminalptr = strtok_r(source, "\t", &tokstate);
   if (terminalptr == NULL) {
     fprintf(stderr, "Terminal field not found!\n");
     return false;          
@@ -203,7 +222,7 @@ bool ParseNonterminalLine(char *source,
   terminal = terminalptr;
 
   char *probability_str;
-  probability_str = strtok(NULL, "\t");
+  probability_str = strtok_r(NULL, "\t", &tokstate);
   if (probability_str == NULL) {
     fprintf(stderr, "Probability field not found!\n");
     return false;          
@@ -218,7 +237,7 @@ bool ParseNonterminalLine(char *source,
 
   // The remainder of the line will be source ids
   char *sourceidsptr;
-  sourceidsptr = strtok(NULL, "\n");
+  sourceidsptr = strtok_r(NULL, "\n", &tokstate);
   if (sourceidsptr == NULL) {
     fprintf(stderr,
       "Source IDs field not found!\n");
@@ -226,7 +245,18 @@ bool ParseNonterminalLine(char *source,
   }
   source_ids = sourceidsptr;
 
+  struct pnldata value = {terminal, probability, source_ids};
+  map.insert({key, value});
+
   return true;
+  } else {
+    auto data = map[key];
+    terminal = data.terminal;
+    probability = data.probability;
+    source_ids = data.source_ids;
+
+    return true;
+  }
 }
 
 
