@@ -136,6 +136,8 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
       return lookup_data;
     }
 
+    free(read_buffer);
+
     // Increment counters
     mpz_add_ui(lookup_data->index, lookup_data->index, 1);
     current_data_position += bytes_read;

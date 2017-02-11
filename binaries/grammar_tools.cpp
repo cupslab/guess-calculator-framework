@@ -201,9 +201,9 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
 
 // out parameter data for nonterminal line
 struct pnldata {
-  std::string terminal;
+  const char *terminal;
   double probability;
-  std::string source_ids;
+  const char *source_ids;
 };
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
@@ -271,7 +271,7 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
 
   source_ids = sourceidsptr;
 
-  struct pnldata value = {terminal, probability, source_ids};
+  struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
   map.insert({key, value});
 
   free(line);
