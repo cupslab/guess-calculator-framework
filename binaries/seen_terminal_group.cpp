@@ -16,6 +16,8 @@
 // Includes not covered in header file
 #include <cstdlib>
 #include <cctype>  // for toupper
+#include <string.h> // strncpy
+
 #include "grammar_tools.h"
 
 #include "seen_terminal_group.h"
@@ -28,17 +30,16 @@ void SeenTerminalGroup::loadFirstString() {
     exit(EXIT_FAILURE);
   }
 
-  char read_buffer[1024];
   unsigned int bytes_read;
-  if (!grammartools::ReadLineFromCharArray(group_data_start_, group_data_size_,
-                                           read_buffer, bytes_read)) {
+  if (!grammartools::ReadLineFromCharArray2(group_data_start_,
+                                           bytes_read)) {
     fprintf(stderr, "Failed read in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
   }    
 
   std::string terminal, source_ids;
   double probability;
-  if (!grammartools::ParseNonterminalLine(read_buffer, terminal,
+  if (!grammartools::ParseNonterminalLine(group_data_start_, bytes_read, terminal,
                                           probability, source_ids)) {
     fprintf(stderr,
       "Line could not be parsed in SeenTerminalGroup::loadFirstString!\n");
@@ -100,14 +101,17 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
 
   // Iterate over the group, looking for the input string
   while(mpz_cmp(lookup_data->index, terminals_size_) < 0) {
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(current_data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(current_data_position,
+                                        bytes_read);
     // Parse the line
     std::string read_terminal, source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, read_terminal,
+    // just for debug output
+    char *read_buffer = (char*)calloc(bytes_read + 1, 1);
+    strncpy(read_buffer, current_data_position, bytes_read);
+
+    grammartools::ParseNonterminalLine(current_data_position, bytes_read, read_terminal,
                                        probability, source_ids);
 
     if (read_terminal == terminal) {
@@ -200,14 +204,13 @@ void SeenTerminalGroup::SeenTerminalGroupStringIterator::
 bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
     increment() {
   if (!isEnd()) {
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(current_group_position_, bytes_remaining_,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(current_group_position_,
+                                        bytes_read);
     // Parse the line
     std::string terminal, source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
+    grammartools::ParseNonterminalLine(current_group_position_, bytes_read, terminal,
                                        probability, source_ids);
     // Adjust class variables
     current_group_position_ += bytes_read;

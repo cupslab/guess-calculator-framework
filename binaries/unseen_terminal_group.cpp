@@ -78,10 +78,9 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   mpz_init_set_ui(seen_terminals_cant_be_generated, 0);  
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and terminate
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       break;
@@ -90,7 +89,7 @@ bool UnseenTerminalGroup::processSeenTerminals() {
     // Else parse the line
     std::string terminal, source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
+    grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
                                        probability, source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
@@ -462,16 +461,15 @@ void UnseenTerminalGroup::findUnseenTerminals(
   size_t bytes_remaining = terminal_data_size_;
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     if (bytes_read == 1) {
       break;
     }
     std::string terminal, source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
+    grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
                                        probability, source_ids);
 
     // If this terminal can be generated, get its index and store in
@@ -536,10 +534,9 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
   mpz_init_set_ui(lower_count, 0);
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and terminate
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       break;
@@ -547,7 +544,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
     // Else parse the line
     std::string read_terminal, source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, read_terminal,
+    grammartools::ParseNonterminalLine(data_position, bytes_read, read_terminal,
                                        probability, source_ids);
 
     // Check if this terminal can actually be produced by the generator mask

@@ -176,10 +176,9 @@ bool Nonterminal::initializeTerminalGroups() {
 
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and move forward
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       in_seen_groups = false;
@@ -193,7 +192,7 @@ bool Nonterminal::initializeTerminalGroups() {
     // Parse the line
     std::string terminal, source_ids;
     double probability;
-    if (!grammartools::ParseNonterminalLine(read_buffer, terminal,
+    if (!grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
                                             probability, source_ids)) {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",

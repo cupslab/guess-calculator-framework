@@ -19,6 +19,7 @@
 #include <cstring>
 #include <sstream>
 
+#include <string.h>
 #include <unordered_map>
 
 #include "grammar_tools.h"
@@ -140,7 +141,22 @@ std::string StripBreakCharacterFromTerminal(const std::string& inputstring) {
   return unbroken;
 }
 
+// Given a source pointer of size source_length, return 
+// length of a line
+bool ReadLineFromCharArray2(const char *source,
+                            unsigned int &size) {
+  const char* end = strchr(source, '\n');
 
+  if (end == NULL) {
+    return false;
+  }
+
+  unsigned int length = (end - source) + 1;
+
+  size = length;
+  return true;
+}
+  
 // Given a source pointer of size source_length, place one line from the
 // source into the destination and provide the number of bytes read.
 //
@@ -196,23 +212,32 @@ struct pnldata {
 // NOTE: This function uses strtok which destroys that source buffer.
 // 
 // Return true on success, output the offending line to stderr on failure
-bool ParseNonterminalLine(char *source,
+bool ParseNonterminalLine(const char *source, const unsigned int length,
                           std::string& terminal, 
                           double& probability,
                           std::string& source_ids) {
 
   // do not reparse previously seen lines
   // protect if multithreaded
-  static std::unordered_map<std::string, struct pnldata> map;
+  static std::unordered_map<void *, struct pnldata> map;
 
-  std::string key = source;
+  void * key = (void *)source;
 
   if (map.count(key) == 0) {
   // Tokenize the buffer using strtok
   char *terminalptr;
   char *tokstate;
 
-  terminalptr = strtok_r(source, "\t", &tokstate);
+  // get writable copy of string
+  char *line = (char *)calloc(length + 1, 1);
+  if (!line) {
+    return false;
+  }
+
+  strncpy(line, source, length);
+  
+
+  terminalptr = strtok_r(line, "\t", &tokstate);
   if (terminalptr == NULL) {
     fprintf(stderr, "Terminal field not found!\n");
     return false;          
@@ -243,11 +268,13 @@ bool ParseNonterminalLine(char *source,
       "Source IDs field not found!\n");
     return false;          
   }
+
   source_ids = sourceidsptr;
 
   struct pnldata value = {terminal, probability, source_ids};
   map.insert({key, value});
 
+  free(line);
   return true;
   } else {
     auto data = map[key];
@@ -274,12 +301,11 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
 
   while (bytes_remaining > 0) {
     // Read a line from source into a buffer
-    char read_buffer[1024];
     unsigned int bytes_read;
     // Note: bytes_read below is passed-by-reference (see declaration of
     // ReadLineFromCharArray)
-    if (!grammartools::ReadLineFromCharArray(current_position, bytes_remaining,
-                                             read_buffer, bytes_read)) {
+    if (!grammartools::ReadLineFromCharArray2(current_position,
+                                             bytes_read)) {
       fprintf(stderr,
         "Newline character not found with read starting at byte %ld!\n",
         current_position - source);
@@ -297,7 +323,7 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
     // the last probability seen
     std::string terminal, source_ids;
     double probability;
-    if (!grammartools::ParseNonterminalLine(read_buffer, terminal,
+    if (!grammartools::ParseNonterminalLine(current_position, bytes_read, terminal,
                                             probability, source_ids)) {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
@@ -334,12 +360,11 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
                           bool& end_of_group) {
   unsigned int bytes_read;
 
-  // Grab current line
-  char read_buffer[1024];
-  if (!ReadLineFromCharArray(source, source_length,
-                             read_buffer, bytes_read)) {
+  if (!ReadLineFromCharArray2(source, bytes_read)) {
     return false;
   }
+
+  unsigned int firstlength = bytes_read;
 
   // Case: current line is blank -- this is not counted as an end of group
   if (bytes_read == 1) {
@@ -354,11 +379,12 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   }
 
   // Now that we know there is a next line, grab it
-  char peek_buffer[1024];
-  if (!ReadLineFromCharArray(source + bytes_read, source_length,
-                             peek_buffer, bytes_read)) {
+  const char *peek = source + bytes_read;
+  if (!ReadLineFromCharArray2(peek, bytes_read)) {
     return false;
   }
+
+  unsigned int peeklength = bytes_read;
 
   // Case: next line is blank
   if (bytes_read == 1) {
@@ -371,11 +397,11 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   // but still return false on parse error)
   std::string terminal, source_ids;
   double current_probability, next_probability;
-  if (!ParseNonterminalLine(read_buffer, terminal,
+  if (!ParseNonterminalLine(source, firstlength, terminal,
                             current_probability, source_ids)) {
     return false;         
   }
-  if (!ParseNonterminalLine(peek_buffer, terminal,
+  if (!ParseNonterminalLine(peek, peeklength, terminal,
                             next_probability, source_ids)) {
     return false;
   }

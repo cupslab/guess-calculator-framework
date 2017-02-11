@@ -51,6 +51,10 @@ bool ReadStructureLine(FILE *fileptr,
 // Remove the \x01 character from the input string
 std::string StripBreakCharacterFromTerminal(const std::string& inputstring);
 
+// Given a source pointer of size source_length, return
+// length of a line
+bool ReadLineFromCharArray2(const char *source,
+                            unsigned int &size);
 
 // Given a source pointer of size source_length, place one line from the
 // source into the destination and provide the number of bytes read.
@@ -67,7 +71,7 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
 // NOTE: This function uses strtok which destroys that source buffer.
 // 
 // Return true on success, output the offending line to stderr on failure
-bool ParseNonterminalLine(char *source,
+bool ParseNonterminalLine(const char *source, const unsigned int length,
                           std::string& terminal, 
                           double& probability,
                           std::string& source_ids);
