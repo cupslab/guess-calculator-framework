@@ -213,16 +213,16 @@ struct pnldata {
 // 
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(const char *source, const unsigned int length,
-                          std::string& terminal, 
+                          const char **terminal, 
                           double& probability,
-                          std::string& source_ids) {
+                          const char **source_ids) {
 
   // do not reparse previously seen lines
+  // hit rates become close to 100%
   // protect if multithreaded
   static std::unordered_map<void *, struct pnldata> map;
 
   void * key = (void *)source;
-
   if (map.count(key) == 0) {
   // Tokenize the buffer using strtok
   char *terminalptr;
@@ -240,11 +240,8 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   terminalptr = strtok_r(line, "\t", &tokstate);
   if (terminalptr == NULL) {
     fprintf(stderr, "Terminal field not found!\n");
-    return false;          
+    return false;
   }
-  // Copy the c-string to the out-parameter using the 
-  // std::string assignment operator
-  terminal = terminalptr;
 
   char *probability_str;
   probability_str = strtok_r(NULL, "\t", &tokstate);
@@ -269,21 +266,18 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
     return false;          
   }
 
-  source_ids = sourceidsptr;
-
   struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
   map.insert({key, value});
 
   free(line);
-  return true;
-  } else {
-    auto data = map[key];
-    terminal = data.terminal;
-    probability = data.probability;
-    source_ids = data.source_ids;
-
-    return true;
   }
+
+  auto data = map[key];
+  *terminal = data.terminal;
+  probability = data.probability;
+  *source_ids = data.source_ids;
+
+  return true;
 }
 
 
@@ -321,10 +315,10 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
 
     // Get probability from the line so we can see if it is different from
     // the last probability seen
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    if (!grammartools::ParseNonterminalLine(current_position, bytes_read, terminal,
-                                            probability, source_ids)) {
+    if (!grammartools::ParseNonterminalLine(current_position, bytes_read, &terminal,
+                                            probability, &source_ids)) {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         current_position - source);
@@ -395,14 +389,14 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   // Case: next line has differing probability from current line
   // Parse both lines and extract the probabilities (ignore other fields,
   // but still return false on parse error)
-  std::string terminal, source_ids;
+  const char *terminal, *source_ids;
   double current_probability, next_probability;
-  if (!ParseNonterminalLine(source, firstlength, terminal,
-                            current_probability, source_ids)) {
+  if (!ParseNonterminalLine(source, firstlength, &terminal,
+                            current_probability, &source_ids)) {
     return false;         
   }
-  if (!ParseNonterminalLine(peek, peeklength, terminal,
-                            next_probability, source_ids)) {
+  if (!ParseNonterminalLine(peek, peeklength, &terminal,
+                            next_probability, &source_ids)) {
     return false;
   }
   end_of_group = (current_probability != next_probability);

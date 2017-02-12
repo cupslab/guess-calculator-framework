@@ -37,10 +37,10 @@ void SeenTerminalGroup::loadFirstString() {
     exit(EXIT_FAILURE);
   }    
 
-  std::string terminal, source_ids;
+  const char *terminal, *source_ids;
   double probability;
-  if (!grammartools::ParseNonterminalLine(group_data_start_, bytes_read, terminal,
-                                          probability, source_ids)) {
+  if (!grammartools::ParseNonterminalLine(group_data_start_, bytes_read, &terminal,
+                                          probability, &source_ids)) {
     fprintf(stderr,
       "Line could not be parsed in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
@@ -51,24 +51,26 @@ void SeenTerminalGroup::loadFirstString() {
   //
   // Check for a size mismatch -- we only check this here, in loadFirstString
   // and assume that this function will work for all other modifications
-  if (terminal.size() != out_representation_.size()) {
+  if (strlen(terminal) != out_representation_.size()) {
     fprintf(stderr,
       "out_representation could not be matched in "
       "SeenTerminalGroup::loadFirstString!\n"
       "out_representation_: %s\nterminal: %s\n",
-      out_representation_.c_str(), terminal.c_str());
+      out_representation_.c_str(), terminal);
     exit(EXIT_FAILURE);    
   }
 
   // Check if modifications are needed and record
+  std::string terminalstr(terminal);
+
   if (out_representation_.find('U') != std::string::npos) {
     out_matching_needed_ = true;
-    matchOutRepresentation(terminal);
+    matchOutRepresentation(terminalstr);
   } else {
     out_matching_needed_ = false;
   }
 
-  first_string_ = terminal;
+  first_string_ = terminalstr;
 }
 
 
@@ -105,14 +107,14 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
     grammartools::ReadLineFromCharArray2(current_data_position,
                                         bytes_read);
     // Parse the line
-    std::string read_terminal, source_ids;
+    const char *read_terminal, *source_ids;
     double probability;
     // just for debug output
     char *read_buffer = (char*)calloc(bytes_read + 1, 1);
     strncpy(read_buffer, current_data_position, bytes_read);
 
-    grammartools::ParseNonterminalLine(current_data_position, bytes_read, read_terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(current_data_position, bytes_read, &read_terminal,
+                                       probability, &source_ids);
 
     if (read_terminal == terminal) {
       lookup_data->parse_status = kCanParse;
@@ -130,7 +132,7 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
         fprintf(stderr,
           "Could not parse source ids %s in line %s in "
           "SeenTerminalGroup::lookup!\n",
-          source_ids.c_str(), read_buffer);
+          source_ids, read_buffer);
         exit(EXIT_FAILURE);
       }
       return lookup_data;
@@ -210,10 +212,10 @@ bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
     grammartools::ReadLineFromCharArray2(current_group_position_,
                                         bytes_read);
     // Parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(current_group_position_, bytes_read, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(current_group_position_, bytes_read, &terminal,
+                                       probability, &source_ids);
     // Adjust class variables
     current_group_position_ += bytes_read;
     // Adjust bytes_remaining_ but make sure we don't overflow the unsigned in
@@ -222,11 +224,12 @@ bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
     else
       bytes_remaining_ = 0;
 
+    std::string terminalstr(terminal);
     // Uppercase the terminal in the correct positions, if needed
     if (parent_->out_matching_needed_)
-      parent_->matchOutRepresentation(terminal);
+      parent_->matchOutRepresentation(terminalstr);
 
-    current_string_ = terminal.c_str();
+    current_string_ = terminalstr.c_str();
     return true;
   }
   return false;

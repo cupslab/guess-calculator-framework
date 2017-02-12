@@ -87,10 +87,10 @@ bool UnseenTerminalGroup::processSeenTerminals() {
     }
 
     // Else parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                       probability, &source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
     if (canGenerateTerminal(terminal))
@@ -467,10 +467,10 @@ void UnseenTerminalGroup::findUnseenTerminals(
     if (bytes_read == 1) {
       break;
     }
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                       probability, &source_ids);
 
     // If this terminal can be generated, get its index and store in
     // the BitArray if the index of the terminal is within our region
@@ -542,10 +542,10 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
       break;
     }
     // Else parse the line
-    std::string read_terminal, source_ids;
+    const char *read_terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(data_position, bytes_read, read_terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &read_terminal,
+                                       probability, &source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
     if (canGenerateTerminal(read_terminal)) {
@@ -562,7 +562,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
           fprintf(stderr, "string: %s has same index as terminal: %s"
                           "in indexInTerminalGroup with out_representation_: %s"
                           " but strings are not equal!\n",
-                          terminal.c_str(), read_terminal.c_str(),
+                          terminal.c_str(), read_terminal,
                           out_representation_.c_str());
           exit(EXIT_FAILURE);
         }

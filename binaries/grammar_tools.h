@@ -72,9 +72,9 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
 // 
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(const char *source, const unsigned int length,
-                          std::string& terminal, 
+                          const char **terminal, 
                           double& probability,
-                          std::string& source_ids);
+                          const char **source_ids);
 
 // Given a source pointer of size source_length, count the number of terminal
 // groups in the data and place the result in an out parameter.

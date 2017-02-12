@@ -190,10 +190,10 @@ bool Nonterminal::initializeTerminalGroups() {
     }
 
     // Parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    if (!grammartools::ParseNonterminalLine(data_position, bytes_read, terminal,
-                                            probability, source_ids)) {
+    if (!grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                            probability, &source_ids)) {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         data_position - terminal_data_);
