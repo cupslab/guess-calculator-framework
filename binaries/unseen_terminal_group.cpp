@@ -304,6 +304,7 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
 void UnseenTerminalGroup::terminalIndex(mpz_t result,
                                         const std::string& terminal, 
                                         mpz_t region_end /*= NULL*/) const {
+  // 15% of values repeat
   mpz_init_set_ui(result, 0);
 
   // Iterate over the generator mask and check each character of the terminal
