@@ -54,14 +54,14 @@ public:
 
   // Look up a terminal in this group
   // Returns a LookupData struct with relevant fields set
-  virtual LookupData* lookup(const std::string& terminal) const = 0;
+  virtual LookupData* lookup(const char *terminal) const = 0;
 
   // Return just the "index" of the given string in the terminal group (-1 if 
   // no match).  
   // By convention, mpz_t types are not returned, but are passed by reference.
   // See http://stackoverflow.com/a/13396028
   virtual void indexInTerminalGroup(mpz_t result, 
-                                    const std::string& teststring) const = 0;
+                                    const char *teststring) const = 0;
 
   class TerminalGroupStringIterator {
   public:

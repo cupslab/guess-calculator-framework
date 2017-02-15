@@ -303,7 +303,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
                  downcased_string.begin(), ::tolower);
   for (uint64_t i = 0; i < terminal_groups_size_; ++i) {
     // If index is not -1, then this terminal group can produce the input string
-    LookupData *terminal_lookup = terminal_groups_[i]->lookup(downcased_string);
+    LookupData *terminal_lookup = terminal_groups_[i]->lookup(downcased_string.c_str());
 
     if (terminal_lookup->parse_status & kCanParse) {
       // Copy terminal_lookup into lookup_data

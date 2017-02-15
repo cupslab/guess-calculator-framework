@@ -94,7 +94,7 @@ std::string SeenTerminalGroup::getFirstString() const {
 //
 // Die on failure to parse source_ids
 //
-LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
+LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
   LookupData *lookup_data = new LookupData;
 
   mpz_init_set_ui(lookup_data->index, 0);
@@ -116,7 +116,8 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
     grammartools::ParseNonterminalLine(current_data_position, bytes_read, &read_terminal,
                                        probability, &source_ids);
 
-    if (read_terminal == terminal) {
+    auto len = strlen(terminal);
+    if ((len == strlen(read_terminal)) && (strncmp(terminal, read_terminal, len) == 0)) {
       lookup_data->parse_status = kCanParse;
       if (probability_ != probability) {
         fprintf(stderr,
@@ -160,7 +161,7 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
 // This function simply calls lookup, and then returns just the index
 //
 void SeenTerminalGroup::indexInTerminalGroup(mpz_t result, 
-                                             const std::string& teststring) const {
+                                             const char *teststring) const {
   LookupData *lookup_data = lookup(teststring);
   mpz_init(result);
   mpz_set(result, lookup_data->index);

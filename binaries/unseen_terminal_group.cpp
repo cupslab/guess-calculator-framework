@@ -21,6 +21,8 @@
 #include "grammar_tools.h"
 #include "bit_array.h"
 
+#include <string.h>
+
 #include "unseen_terminal_group.h"
 
 // Non-literal static class members cannot be initialized in the class body
@@ -256,8 +258,8 @@ void UnseenTerminalGroup::initTotalTerminals() {
 
 
 // Given a terminal, determine if it can be produced *by the generator mask*
-bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const {
-  if (terminal.size() != generator_mask_.size())
+bool UnseenTerminalGroup::canGenerateTerminal(const char *terminal) const {
+  if (strlen(terminal) != generator_mask_.size())
     return false;
 
   // Iterate over the generator mask and check each character of the terminal
@@ -302,7 +304,7 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
 // above region_end, but its value should be ignored!
 //
 void UnseenTerminalGroup::terminalIndex(mpz_t result,
-                                        const std::string& terminal, 
+                                        const char *terminal, 
                                         mpz_t region_end /*= NULL*/) const {
   // 15% of values repeat
   mpz_init_set_ui(result, 0);
@@ -338,7 +340,7 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
                       "terminal: %s cannot be generated!\n"
                       "  In terminalIndex with out_representation_: %s!\n",
                       i, generator_mask_.c_str(), terminal[i],
-                      terminal.c_str(), out_representation_.c_str());
+                      terminal, out_representation_.c_str());
       exit(EXIT_FAILURE);      
     }
     // Use the formula from: http://stackoverflow.com/a/759319
@@ -516,7 +518,7 @@ std::string UnseenTerminalGroup::getFirstString() const {
 // the other methods of this class.  Use terminalIndex on the input string,
 // and then subtract the number of seen terminals with a lower index.
 //
-LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
+LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
   LookupData *lookup_data = new LookupData;
 
   if (canGenerateTerminal(terminal))
@@ -559,11 +561,12 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
       } else if (compare_result == 0) {
         // Our input string matches a seen terminal, so return -1, but perform
         // a sanity check to make sure things are working properly.
-        if (terminal != read_terminal) {
-          fprintf(stderr, "string: %s has same index as terminal: %s"
+        auto len = strlen(terminal);
+        if ((len != strlen(read_terminal)) || (strncmp(terminal, read_terminal, len) != 0)) {
+          fprintf(stderr, "string: %s has same index as terminal: %s "
                           "in indexInTerminalGroup with out_representation_: %s"
                           " but strings are not equal!\n",
-                          terminal.c_str(), read_terminal,
+                          terminal, read_terminal,
                           out_representation_.c_str());
           exit(EXIT_FAILURE);
         }
@@ -597,7 +600,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
 // This function simply calls lookup, and then returns just the index
 // 
 void UnseenTerminalGroup::indexInTerminalGroup(mpz_t result,
-                                               const std::string& teststring) const {
+                                               const char *teststring) const {
   LookupData *lookup_data = lookup(teststring);
   mpz_init(result);
   mpz_set(result, lookup_data->index);
