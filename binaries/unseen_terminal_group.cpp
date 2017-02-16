@@ -75,9 +75,8 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   // Iterate over terminal_data_ until we reach a blank line
   const char *data_position = terminal_data_;
   size_t bytes_remaining = terminal_data_size_;
-  mpz_t seen_terminals_size, seen_terminals_cant_be_generated;
-  mpz_init_set_ui(seen_terminals_size, 0);  
-  mpz_init_set_ui(seen_terminals_cant_be_generated, 0);  
+  unsigned long int seen_terminals_size = 0;
+  unsigned long int seen_terminals_cant_be_generated = 0;
   while (bytes_remaining > 0) {
     // Read the current line
     unsigned int bytes_read;
@@ -95,11 +94,11 @@ bool UnseenTerminalGroup::processSeenTerminals() {
                                        probability, &source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
-    if (canGenerateTerminal(terminal))
-      mpz_add_ui(seen_terminals_size, seen_terminals_size, 1);
-    else
-      mpz_add_ui(seen_terminals_cant_be_generated, 
-                 seen_terminals_cant_be_generated, 1);
+    if (canGenerateTerminal(terminal)) {
+      seen_terminals_size++;
+    } else {
+      seen_terminals_cant_be_generated++;
+    }
 
     // Move counters forward
     data_position += bytes_read;
@@ -107,9 +106,12 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   }  // end while (bytes_remaining > 0)
 
   // Set total_terminals_ and terminals_size_
+  // do they have to be mp ints? if so, they couldn't fit in a file.
   initTotalTerminals();
-  if (mpz_cmp(seen_terminals_size, total_terminals_) >= 0) {
-    char *sts_string = mpz_get_str(NULL, 10, seen_terminals_size);
+  mpz_t sts;
+  mpz_init_set_ui(sts, seen_terminals_size);
+  if (mpz_cmp(sts, total_terminals_) >= 0) {
+    char *sts_string = mpz_get_str(NULL, 10, sts);
     char *tt_string  = mpz_get_str(NULL, 10, total_terminals_);
     fprintf(stderr, "Unexpected error!\n"
                     "seen_terminals_size exceeds total_terminals_ found!\n"
@@ -118,11 +120,10 @@ bool UnseenTerminalGroup::processSeenTerminals() {
                     sts_string, tt_string);
     return false;
   }
-  mpz_sub(terminals_size_, total_terminals_, seen_terminals_size);
+  mpz_sub(terminals_size_, total_terminals_, sts);
   probability_ = total_probability_mass_ / mpz_get_d(terminals_size_);
   // Cleanup intermediate BigInts
-  mpz_clear(seen_terminals_size);
-  mpz_clear(seen_terminals_cant_be_generated);
+  mpz_clear(sts);
 
 
   // Finally, we need to determine the value of the first unseen string.
@@ -312,6 +313,7 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
   // Iterate over the generator mask and check each character of the terminal
   // Since we assume canGenerateTerminal has already been called, we deduce
   // that terminal and generator_mask_ are the same size
+  // XXXstroucki int?
   for (int i = generator_mask_.size() - 1; i >= 0; --i) {
     unsigned int character_base;
     int character_index;
@@ -502,7 +504,7 @@ void UnseenTerminalGroup::findUnseenTerminals(
 
 
 // Simple getter function for first string
-std::string UnseenTerminalGroup::getFirstString() const {
+const std::string& UnseenTerminalGroup::getFirstString() const {
   return first_string_;
 }
 
@@ -718,7 +720,7 @@ bool UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
 
 
 // Simple getter
-std::string UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
+const std::string& UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }

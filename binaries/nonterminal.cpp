@@ -414,8 +414,7 @@ TerminalGroup::TerminalGroupStringIterator*
 
 // Simple getter function that returns a copy of the USLD representation for
 // the nonterminal
-std::string Nonterminal::getRepresentation() const {
-  std::string representation(representation_);
-  return representation;
+const std::string& Nonterminal::getRepresentation() const {
+  return representation_;
 }
 

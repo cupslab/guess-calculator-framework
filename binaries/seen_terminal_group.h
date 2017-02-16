@@ -53,7 +53,7 @@ public:
   void indexInTerminalGroup(mpz_t result, const char *teststring) const;
 
   // Return the "first" string of the terminal (used for string representation)
-  std::string getFirstString() const;
+  const std::string& getFirstString() const;
 
   class SeenTerminalGroupStringIterator : public TerminalGroupStringIterator {
   public:
@@ -63,7 +63,7 @@ public:
     void restart();
     bool increment();
     bool isEnd() const;
-    std::string getCurrentString() const;
+    const std::string& getCurrentString() const;
 
   private:
     const SeenTerminalGroup* const parent_;

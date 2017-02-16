@@ -50,7 +50,7 @@ public:
   }
   double getProbability() { return probability_; }
   // Return the "first" string of the terminal (used for string representation)
-  virtual std::string getFirstString() const = 0;
+  virtual const std::string& getFirstString() const = 0;
 
   // Look up a terminal in this group
   // Returns a LookupData struct with relevant fields set
@@ -74,7 +74,7 @@ public:
     // Check if past the end
     virtual bool isEnd() const = 0;
     // Return the terminal string at the current iterator state
-    virtual std::string getCurrentString() const = 0;
+    virtual const std::string& getCurrentString() const = 0;
   };
 
   // Return a string iterator object

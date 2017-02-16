@@ -81,7 +81,7 @@ public:
       uint64_t group_index) const;
 
   // getter methods
-  std::string getRepresentation() const;
+  const std::string& getRepresentation() const;
 
 private:
   // Part of the delayed initialization process -- called from LoadNonterminal

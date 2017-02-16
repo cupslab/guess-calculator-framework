@@ -76,7 +76,7 @@ void SeenTerminalGroup::loadFirstString() {
 
 
 // Simple getter function for first string
-std::string SeenTerminalGroup::getFirstString() const {
+const std::string& SeenTerminalGroup::getFirstString() const {
   return first_string_;
 }
 
@@ -244,7 +244,7 @@ bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
 
 
 // Simple getter
-std::string SeenTerminalGroup::SeenTerminalGroupStringIterator::
+const std::string& SeenTerminalGroup::SeenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }

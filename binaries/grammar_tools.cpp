@@ -272,7 +272,7 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   free(line);
   }
 
-  auto data = map[key];
+  auto& data = map[key];
   *terminal = data.terminal;
   probability = data.probability;
   *source_ids = data.source_ids;
