@@ -223,7 +223,8 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   static std::unordered_map<void *, struct pnldata> map;
 
   void * key = (void *)source;
-  if (map.count(key) == 0) {
+  auto it = map.find(key);
+  if (it == map.end()) {
   // Tokenize the buffer using strtok
   char *terminalptr;
   char *tokstate;
@@ -268,11 +269,12 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
 
   struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
   map.insert({key, value});
+  it = map.find(key);
 
   free(line);
   }
 
-  auto& data = map[key];
+  auto& data = it->second;
   *terminal = data.terminal;
   probability = data.probability;
   *source_ids = data.source_ids;
