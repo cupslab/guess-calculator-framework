@@ -18,6 +18,7 @@
 #include <cctype>  // for toupper
 #include <string.h> // strncpy
 
+#include "big_count.h"
 #include "grammar_tools.h"
 
 #include "seen_terminal_group.h"
@@ -93,16 +94,20 @@ const std::string& SeenTerminalGroup::getFirstString() const {
 // to make sure they work correctly.
 //
 // Die on failure to parse source_ids
+// XXXstroucki to count from 0 to 2^64 would take 200 years on a 3 GHz
+// box doing nothing else. Do we need big math?
 //
 LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
   LookupData *lookup_data = new LookupData;
 
-  mpz_init_set_ui(lookup_data->index, 0);
+  mpz_init(lookup_data->index);
+  BigCount index; // initialized to 0
+  BigCount terminalsSize(terminals_size_);
   const char* current_data_position = group_data_start_;
   size_t bytes_remaining = group_data_size_;
 
   // Iterate over the group, looking for the input string
-  while(mpz_cmp(lookup_data->index, terminals_size_) < 0) {
+  while(BigCount::cmp(index, terminalsSize) < 0) {
     unsigned int bytes_read;
     grammartools::ReadLineFromCharArray2(current_data_position,
                                         bytes_read);
@@ -136,13 +141,14 @@ LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
           source_ids, read_buffer);
         exit(EXIT_FAILURE);
       }
+      BigCount::get(lookup_data->index, index);
       return lookup_data;
     }
 
     free(read_buffer);
 
     // Increment counters
-    mpz_add_ui(lookup_data->index, lookup_data->index, 1);
+    BigCount::add(index, index, 1);
     current_data_position += bytes_read;
     bytes_remaining -= bytes_read;
   }

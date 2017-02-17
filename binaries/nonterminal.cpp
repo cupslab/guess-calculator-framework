@@ -23,7 +23,9 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <memory>
 
+#include "big_count.h"
 #include "grammar_tools.h"
 #include "seen_terminal_group.h"
 #include "unseen_terminal_group.h"
@@ -172,7 +174,9 @@ bool Nonterminal::initializeTerminalGroups() {
   char *group_start = terminal_data_;
   uint64_t current_group_number = 0;
   mpz_t current_group_size;
-  mpz_init_set_ui(current_group_size, 1);
+  mpz_init(current_group_size);
+
+  std::shared_ptr<BigCount> groupSize = std::make_shared<BigCount>(1);
 
   while (bytes_remaining > 0) {
     // Read the current line
@@ -215,24 +219,26 @@ bool Nonterminal::initializeTerminalGroups() {
     // If at the end of a group, initalize a new Terminal Group, else
     // increment the current group size.
     if (is_end_of_group) {
-      if (in_seen_groups)
+      if (in_seen_groups) {
+        BigCount::get(current_group_size, *groupSize.get());
         terminal_groups_[current_group_number] = 
           new SeenTerminalGroup(terminal_data_, probability, 
                                 current_group_size, representation_,
                                 group_start,
                                 data_position - group_start + bytes_read);
-      else
+      } else {
         // For unseen groups, the source_ids field will contain a generator mask
         terminal_groups_[current_group_number] =
           new UnseenTerminalGroup(terminal_data_, probability,
                                   source_ids, representation_,
                                   terminal_data_size_);
+      }
       // Set group_start to the start of the next line
       group_start = data_position + bytes_read;
       ++current_group_number;
-      mpz_set_ui(current_group_size, 1);
+      groupSize = std::make_shared<BigCount>(1);
     } else {
-      mpz_add_ui(current_group_size, current_group_size, 1);
+      BigCount::add(*groupSize.get(), *groupSize.get(), 1);
     }
 
     // Move counters forward

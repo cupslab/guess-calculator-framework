@@ -12,8 +12,8 @@ class BigCount {
     static int cmp(const BigCount& op1, const BigCount& op2);
     static void get(mpz_t dest, const BigCount& src);
     BigCount();
-    BigCount(uint64_t init);
-    BigCount(mpz_t init);
+    BigCount(const uint64_t init);
+    BigCount(const mpz_t init);
     ~BigCount();
 
   private:

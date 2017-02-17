@@ -128,13 +128,13 @@ BigCount::BigCount() {
   return;
 }
 
-BigCount::BigCount(uint64_t init) {
+BigCount::BigCount(const uint64_t init) {
   nativeval = init;
   usemp = false;
   return;
 }
 
-BigCount::BigCount(mpz_t init) {
+BigCount::BigCount(const mpz_t init) {
   usemp = false;
   uint64_t check = mpz_get_ui(init);
   if (mpz_cmp_ui(init, check) > 0) {
