@@ -13,7 +13,8 @@ bool mul_overflow(const uint64_t op1, const uint64_t op2, uint64_t* dest) {
     return false;
   }
 
-  if (op1 > std::numeric_limits<uint64_t>::max() / op2) {
+  //if ((((op1|op2)  >> 31) > 0) && (op1 > std::numeric_limits<uint64_t>::max() / op2)) {
+  if ((op1 > std::numeric_limits<uint64_t>::max() / op2)) {
     return true;
   } else {
     *dest = op1 * op2;
@@ -155,8 +156,6 @@ inline unsigned long int rnd() {
   unsigned int foo;
   unsigned long int result;
   result = (unsigned int)random();
-  result <<= 32;
-  result ^= (unsigned int)random();
   return result;
 }
 
@@ -168,15 +167,15 @@ void test_add() {
   mpz_init(op2);
   mpz_init(result);
 
-    a = rnd();
+    a = rnd() << 34;
     mpz_set_ui(op1, a);
-    b = rnd();
-    mpz_mul_ui(result, op1, b);
+    b = rnd() << 34;
+    mpz_add_ui(result, op1, b);
 
     BigCount o1(a);
     BigCount o2(result);
 
-    BigCount::mul(o1, o1, b);
+    BigCount::add(o1, o1, b);
 
     if (BigCount::cmp(o1, o2)) {
       assert(0);
@@ -191,9 +190,9 @@ void test_mul() {
   mpz_init(op2);
   mpz_init(result);
 
-    a = rnd();
+    a = rnd() << 2;
     mpz_set_ui(op1, a);
-    b = rnd();
+    b = rnd() << 2;
     mpz_mul_ui(result, op1, b);
 
     BigCount o1(a);
@@ -207,9 +206,13 @@ void test_mul() {
 }
 
 int main() {
+  int counter = 0;
   while (1) {
     test_add();
     test_mul();
+    counter++;
+    if (counter % 100000 == 0) printf("%u passed\n", counter);
+    //if (counter > 1000000) break;
   }
 
   return 0;
