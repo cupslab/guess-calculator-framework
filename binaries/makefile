@@ -21,7 +21,7 @@ CLASSFILES=bit_array.* gcfmacros.* grammar_tools.* lookup_data.* lookup_tools.* 
 
 CLASS_CPP_FILES = grammar_tools.cpp lookup_tools.cpp mixed_radix_number.cpp \
            nonterminal_collection.cpp nonterminal.cpp pcfg.cpp pattern_manager.cpp seen_terminal_group.cpp \
-           structure.cpp unseen_terminal_group.cpp
+           structure.cpp unseen_terminal_group.cpp big_count.cpp
 CLASS_OBJ_FILES = $(CLASS_CPP_FILES:.cpp=.o)
 
 default: main

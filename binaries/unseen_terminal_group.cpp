@@ -18,12 +18,14 @@
 #include <cstdlib>
 #include <cstdint>
 #include <climits>
+#include <memory> // shared
 #include "grammar_tools.h"
 #include "bit_array.h"
 
 #include <string.h>
 
 #include "unseen_terminal_group.h"
+#include "big_count.h"
 
 // Non-literal static class members cannot be initialized in the class body
 const std::string UnseenTerminalGroup::kGeneratorSymbols = 
@@ -234,7 +236,7 @@ void UnseenTerminalGroup::initCharacterLookups() {
 //
 void UnseenTerminalGroup::initTotalTerminals() {
   mpz_init(total_terminals_);
-  mpz_set_ui(total_terminals_, 1);
+  BigCount totterm(1);
   for (unsigned int i = 0; i < generator_mask_.size(); ++i) {
     unsigned int characters_produced;
     switch (generator_mask_[i]) {
@@ -253,8 +255,9 @@ void UnseenTerminalGroup::initTotalTerminals() {
                         generator_mask_.c_str(), out_representation_.c_str());
         exit(EXIT_FAILURE);
     }
-    mpz_mul_ui(total_terminals_, total_terminals_, characters_produced);
+    BigCount::mul(totterm, totterm, characters_produced);
   }
+  BigCount::get(total_terminals_, totterm);
 }
 
 
@@ -304,11 +307,15 @@ bool UnseenTerminalGroup::canGenerateTerminal(const char *terminal) const {
 // and return the current index.  The index returned in this case will be
 // above region_end, but its value should be ignored!
 //
-void UnseenTerminalGroup::terminalIndex(mpz_t result,
+void UnseenTerminalGroup::terminalIndex(mpz_t resultout,
                                         const char *terminal, 
                                         mpz_t region_end /*= NULL*/) const {
   // 15% of values repeat
-  mpz_init_set_ui(result, 0);
+  BigCount result;
+  std::shared_ptr<BigCount> end;
+  if (region_end != NULL) {
+    end = std::make_shared<BigCount>(region_end);
+  }
 
   // Iterate over the generator mask and check each character of the terminal
   // Since we assume canGenerateTerminal has already been called, we deduce
@@ -346,16 +353,20 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
       exit(EXIT_FAILURE);      
     }
     // Use the formula from: http://stackoverflow.com/a/759319
-    mpz_mul_ui(result, result, character_base);
-    mpz_add_ui(result, result, character_index);
+    BigCount::mul(result, result, character_base);
+    BigCount::add(result, result, character_index);
 
     // If the current index is outside the region, stop here
     if (region_end != NULL) {
-      if (mpz_cmp(result, region_end) > 0) {
-        return;
+      if (BigCount::cmp(result, *end.get()) > 0) {
+        break;
       }
     }
   }
+
+  mpz_init(resultout);
+  BigCount::get(resultout, result);
+  return;
 }
 
 
