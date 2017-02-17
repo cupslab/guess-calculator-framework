@@ -146,3 +146,72 @@ BigCount::BigCount(const mpz_t init) {
   }
 }
 
+#ifdef TEST
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
+
+inline unsigned long int rnd() {
+  unsigned int foo;
+  unsigned long int result;
+  result = (unsigned int)random();
+  result <<= 32;
+  result ^= (unsigned int)random();
+  return result;
+}
+
+void test_add() {
+  mpz_t op1, op2, result;
+  unsigned long int a, b;
+
+  mpz_init(op1);
+  mpz_init(op2);
+  mpz_init(result);
+
+    a = rnd();
+    mpz_set_ui(op1, a);
+    b = rnd();
+    mpz_mul_ui(result, op1, b);
+
+    BigCount o1(a);
+    BigCount o2(result);
+
+    BigCount::mul(o1, o1, b);
+
+    if (BigCount::cmp(o1, o2)) {
+      assert(0);
+    }
+}
+
+void test_mul() {
+  mpz_t op1, op2, result;
+  unsigned long int a, b;
+
+  mpz_init(op1);
+  mpz_init(op2);
+  mpz_init(result);
+
+    a = rnd();
+    mpz_set_ui(op1, a);
+    b = rnd();
+    mpz_mul_ui(result, op1, b);
+
+    BigCount o1(a);
+    BigCount o2(result);
+
+    BigCount::mul(o1, o1, b);
+
+    if (BigCount::cmp(o1, o2)) {
+      assert(0);
+    }
+}
+
+int main() {
+  while (1) {
+    test_add();
+    test_mul();
+  }
+
+  return 0;
+}
+#endif
