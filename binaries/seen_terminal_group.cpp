@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cctype>  // for toupper
 #include <string.h> // strncpy
+#include <assert.h>
 
 #include "big_count.h"
 #include "grammar_tools.h"
@@ -96,6 +97,10 @@ const std::string& SeenTerminalGroup::getFirstString() const {
 // Die on failure to parse source_ids
 //
 LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
+  // just for debug output
+  char space[1024];
+  char *read_buffer = space;
+
   LookupData *lookup_data = new LookupData;
 
   mpz_init(lookup_data->index);
@@ -113,8 +118,9 @@ LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
     const char *read_terminal, *source_ids;
     double probability;
     // just for debug output
-    char *read_buffer = (char*)calloc(bytes_read + 1, 1);
+    assert(bytes_read + 1 <= 1024);
     strncpy(read_buffer, current_data_position, bytes_read);
+    read_buffer[bytes_read] = 0;
 
     grammartools::ParseNonterminalLine(current_data_position, bytes_read, &read_terminal,
                                        probability, &source_ids);
@@ -142,8 +148,6 @@ LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
       mpz_set_ui(lookup_data->index, index);
       return lookup_data;
     }
-
-    free(read_buffer);
 
     // Increment counters
     index++;

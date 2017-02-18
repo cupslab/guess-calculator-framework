@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <memory>
+#include <unordered_map>
 
 #include "big_count.h"
 #include "grammar_tools.h"
@@ -31,9 +32,6 @@
 #include "unseen_terminal_group.h"
 
 #include "nonterminal.h"
-
-std::unordered_map<std::string, char *>Nonterminal::mapped_data_;
-std::unordered_map<std::string, size_t>Nonterminal::mapped_data_size_;
 
 // Destructor for Nonterminal -- checks whether variables were initialized 
 // before deleting them
@@ -50,6 +48,10 @@ Nonterminal::~Nonterminal() {
     munmap(terminal_data_, terminal_data_size_);
 }
 
+struct stringsize {
+  char *string;
+  size_t size;
+};
 
 // Init routine will use the given representation to find the correct terminals
 // file in the terminals_folder and memory map it.  It will then make a pass
@@ -64,6 +66,9 @@ Nonterminal::~Nonterminal() {
 // Returns true on success
 bool Nonterminal::loadNonterminal(const std::string& representation,
                                   const std::string& terminals_folder) {
+
+  // protect if multithreaded
+  std::unordered_map<std::string, struct stringsize>mapped_data;
   representation_ = representation;
   // Create "terminal" representation
   terminal_representation_ = representation;
@@ -73,7 +78,8 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
                'L');
 
 
-  if (Nonterminal::mapped_data_.count(terminal_representation_) == 0) {
+  auto it = mapped_data.find(terminal_representation_);
+  if (it == mapped_data.end()) {
 
   // Open the terminal file with open
   int file_handle;
@@ -130,11 +136,14 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     return false;
   }
 
-  Nonterminal::mapped_data_.insert({terminal_representation_, terminal_data_});
-  Nonterminal::mapped_data_size_.insert({terminal_representation_, terminal_data_size_});
+  struct stringsize value = {terminal_data_, terminal_data_size_};
+  mapped_data.insert({terminal_representation_, value});
+
+  it = mapped_data.find(terminal_representation_);
   } else {
-    terminal_data_ = Nonterminal::mapped_data_[terminal_representation_];
-    terminal_data_size_ = Nonterminal::mapped_data_size_[terminal_representation_];
+    auto& value = it->second;
+    terminal_data_ = value.string;
+    terminal_data_size_ = value.size;
   }
 
   // With terminal data initialized, can now initialize terminal groups

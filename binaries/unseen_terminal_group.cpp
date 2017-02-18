@@ -364,7 +364,6 @@ void UnseenTerminalGroup::terminalIndex(mpz_t resultout,
     }
   }
 
-  mpz_init(resultout);
   BigCount::get(resultout, result);
   return;
 }
@@ -475,6 +474,11 @@ void UnseenTerminalGroup::findUnseenTerminals(
   // we use the region_end argument of terminalIndex (see below).
   const char *data_position = terminal_data_;
   size_t bytes_remaining = terminal_data_size_;
+
+  // init this once, rely on terminalIndex overwriting it
+  mpz_t terminal_index;
+  mpz_init(terminal_index);
+
   while (bytes_remaining > 0) {
     // Read the current line
     unsigned int bytes_read;
@@ -492,7 +496,6 @@ void UnseenTerminalGroup::findUnseenTerminals(
     // the BitArray if the index of the terminal is within our region
     // of consideration
     if (canGenerateTerminal(terminal)) {
-      mpz_t terminal_index;
       terminalIndex(terminal_index, terminal, region_end);
       if (mpz_cmp(terminal_index, region_end) <= 0 &&
           mpz_cmp(region_start, terminal_index) <= 0) {
@@ -501,13 +504,13 @@ void UnseenTerminalGroup::findUnseenTerminals(
         unsigned long int bitarray_index = mpz_get_ui(terminal_index);
         found_terminals->markIndex(bitarray_index);
       }
-      // Clear the allocated BigInt before exiting
-      mpz_clear(terminal_index);
     }
     // Move counters forward
     data_position += bytes_read;
     bytes_remaining -= bytes_read;
   }  // end while (bytes_remaining > 0)
+  // Clear the allocated BigInt before exiting
+  mpz_clear(terminal_index);
   mpz_clear(region_end);
   
   return;
@@ -534,9 +537,10 @@ const std::string& UnseenTerminalGroup::getFirstString() const {
 LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
   LookupData *lookup_data = new LookupData;
 
-  if (canGenerateTerminal(terminal))
+  if (canGenerateTerminal(terminal)) {
+    mpz_init(lookup_data->index);
     terminalIndex(lookup_data->index, terminal);
-  else {
+  } else {
     lookup_data->parse_status = kTerminalNotFound | kTerminalCantBeGenerated;
     lookup_data->probability = -1;    
     mpz_init(lookup_data->index);
@@ -548,6 +552,11 @@ LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
   size_t bytes_remaining = terminal_data_size_;
   mpz_t lower_count;
   mpz_init_set_ui(lower_count, 0);
+
+  // init terminal_index outside the loop, rely on terminalIndex overwriting it
+  mpz_t terminal_index;
+  mpz_init(terminal_index);
+
   while (bytes_remaining > 0) {
     // Read the current line
     unsigned int bytes_read;
@@ -566,7 +575,6 @@ LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
     // Check if this terminal can actually be produced by the generator mask
     if (canGenerateTerminal(read_terminal)) {
       // Check if the index of this terminal is less than our index
-      mpz_t terminal_index;
       terminalIndex(terminal_index, read_terminal);
       int compare_result = mpz_cmp(terminal_index, lookup_data->index);
       if (compare_result < 0) {
@@ -590,7 +598,6 @@ LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
         mpz_clear(lower_count);
         return lookup_data;
       }      
-      mpz_clear(terminal_index);
     }
     // Move counters forward
     data_position += bytes_read;
@@ -601,6 +608,7 @@ LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
   lookup_data->probability = probability_;    
   mpz_sub(lookup_data->index, lookup_data->index, lower_count);
   mpz_clear(lower_count);
+  mpz_clear(terminal_index);
   // Set source id
   lookup_data->source_ids.insert("UNSEEN");
   return lookup_data;

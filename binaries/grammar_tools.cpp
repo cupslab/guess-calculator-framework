@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include <string.h>
+#include <assert.h>
 #include <unordered_map>
 
 #include "grammar_tools.h"
@@ -222,6 +223,10 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   // protect if multithreaded
   static std::unordered_map<void *, struct pnldata> map;
 
+  // scratch space
+  static char *line = (char *)malloc(1024);
+  assert(line != 0);
+
   void * key = (void *)source;
   auto it = map.find(key);
   if (it == map.end()) {
@@ -230,13 +235,9 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   char *tokstate;
 
   // get writable copy of string
-  char *line = (char *)calloc(length + 1, 1);
-  if (!line) {
-    return false;
-  }
-
+  assert(length + 1 < 1024);
   strncpy(line, source, length);
-  
+  line[length] = 0;
 
   terminalptr = strtok_r(line, "\t", &tokstate);
   if (terminalptr == NULL) {
@@ -270,8 +271,6 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
   map.insert({key, value});
   it = map.find(key);
-
-  free(line);
   }
 
   auto& data = it->second;
