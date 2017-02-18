@@ -154,7 +154,7 @@ bool PatternManager::intelligentSkipPatternCounter() {
 // of the pattern.  This is done by simply returning the first strings of
 // each of the terminal groups pointed to by the counter, and concatenating
 // them together.
-std::string PatternManager::getFirstStringOfPattern() const {
+const std::string PatternManager::getFirstStringOfPattern() const {
   std::string result("");
   for (unsigned int i = 0; i < structure_size_; ++i) {
     // Get current digit in this place from the pattern counter
@@ -173,7 +173,7 @@ std::string PatternManager::getFirstStringOfPattern() const {
 // of the pattern.  This is done by simply returning the first strings of
 // each of the terminal groups pointed to by the counter, and concatenating
 // them together.
-std::string PatternManager::getCanonicalizedFirstStringOfPattern() const {
+const std::string PatternManager::getCanonicalizedFirstStringOfPattern() const {
   std::string result("");
   MixedRadixNumber* canonical_counter = canonicalizePattern();
 

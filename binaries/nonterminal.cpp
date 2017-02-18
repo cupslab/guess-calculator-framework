@@ -371,7 +371,7 @@ uint64_t Nonterminal::countTerminalGroups() const {
 // When returning values based on a terminal group index, die if the index
 // is outside of the range of available terminal groups
 //
-std::string Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
+const std::string& Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
   if (group_index >= terminal_groups_size_) {
     fprintf(stderr,
       "TerminalGroup index is outside of available range in "

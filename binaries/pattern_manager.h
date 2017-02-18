@@ -112,11 +112,11 @@ public:
   bool intelligentSkipPatternCounter();
 
   // Get the first string that would be produced by the current pattern
-  std::string getFirstStringOfPattern() const;
+  const std::string getFirstStringOfPattern() const;
   // The lookup table will only contain the first string of a permutation, but
   // if we want to match a pattern to a lookup table entry, getFirstStringOfPattern
   // will not work if the current pattern is not the first permutation.
-  std::string getCanonicalizedFirstStringOfPattern() const;
+  const std::string getCanonicalizedFirstStringOfPattern() const;
 
   // Get its probability
   double getPatternProbability() const;
