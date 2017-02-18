@@ -68,7 +68,7 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
                                   const std::string& terminals_folder) {
 
   // protect if multithreaded
-  std::unordered_map<std::string, struct stringsize>mapped_data;
+  static std::unordered_map<std::string, struct stringsize>mapped_data;
   representation_ = representation;
   // Create "terminal" representation
   terminal_representation_ = representation;
