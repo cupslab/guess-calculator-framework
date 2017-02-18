@@ -595,6 +595,7 @@ LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
         lookup_data->parse_status = kTerminalNotFound | kTerminalCollision;
         lookup_data->probability = -1;    
         mpz_set_si(lookup_data->index, -1);
+        mpz_clear(terminal_index);
         mpz_clear(lower_count);
         return lookup_data;
       }      
