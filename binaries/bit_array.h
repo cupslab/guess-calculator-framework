@@ -63,6 +63,7 @@ private:
 
 // HACK - create a reusable object here so we don't have to constantly
 // allocate and deallocate BitArrays
+// XXXstroucki should use c++ locking
 static BitArray *static_bitarray = nullptr;
 static bool ba_in_use = false;  // lock variable
 

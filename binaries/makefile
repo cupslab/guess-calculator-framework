@@ -7,7 +7,7 @@
 # Author: Saranga Komanduri
 #
 CC = g++
-CFLAG =-O0 -g -std=c++0x
+CFLAGS =-O3 -Wall -g -std=c++11
 # Enable the following options (and add \ to the above line) for more warnings
 # -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
 # -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept \
@@ -21,7 +21,7 @@ CLASSFILES=bit_array.* gcfmacros.* grammar_tools.* lookup_data.* lookup_tools.* 
 
 CLASS_CPP_FILES = grammar_tools.cpp lookup_tools.cpp mixed_radix_number.cpp \
            nonterminal_collection.cpp nonterminal.cpp pcfg.cpp pattern_manager.cpp seen_terminal_group.cpp \
-           structure.cpp unseen_terminal_group.cpp
+           structure.cpp unseen_terminal_group.cpp big_count.cpp
 CLASS_OBJ_FILES = $(CLASS_CPP_FILES:.cpp=.o)
 
 default: main
@@ -30,33 +30,33 @@ main: GeneratePatterns sortedcountaggregator LookupGuessNumbers GenerateStrings
 
 # Binaries must be compiled with the GMP library
 GeneratePatterns: GeneratePatterns.o
-	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) GeneratePatterns.o -o GeneratePatterns -lgmpxx -lgmp
+	$(CC) $(CFLAGS) $(CLASS_OBJ_FILES) GeneratePatterns.o -o GeneratePatterns -lgmpxx -lgmp
 
 GeneratePatterns.o: GeneratePatterns.cpp .classes
-	$(CC) $(CFLAG) -c GeneratePatterns.cpp
+	$(CC) $(CFLAGS) -c GeneratePatterns.cpp
 
 GenerateStrings: GenerateStrings.o
-	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) GenerateStrings.o -o GenerateStrings -lgmpxx -lgmp
+	$(CC) $(CFLAGS) $(CLASS_OBJ_FILES) GenerateStrings.o -o GenerateStrings -lgmpxx -lgmp
 
 GenerateStrings.o: GenerateStrings.cpp .classes
-	$(CC) $(CFLAG) -c GenerateStrings.cpp
+	$(CC) $(CFLAGS) -c GenerateStrings.cpp
 
 LookupGuessNumbers: LookupGuessNumbers.o
-	$(CC) $(CFLAG) $(CLASS_OBJ_FILES) LookupGuessNumbers.o -o LookupGuessNumbers -lgmpxx -lgmp
+	$(CC) $(CFLAGS) $(CLASS_OBJ_FILES) LookupGuessNumbers.o -o LookupGuessNumbers -lgmpxx -lgmp
 
 LookupGuessNumbers.o: LookupGuessNumbers.cpp .classes
-	$(CC) $(CFLAG) -c LookupGuessNumbers.cpp
+	$(CC) $(CFLAGS) -c LookupGuessNumbers.cpp
 
 
 .classes: $(CLASSFILES)
-	$(CC) $(CFLAG) -c $(CLASS_CPP_FILES)
+	$(CC) $(CFLAGS) -c $(CLASS_CPP_FILES)
 	touch .classes
 
 sortedcountaggregator: sortedcountaggregator.o
-	$(CC) $(CFLAG) sortedcountaggregator.o -o sortedcountaggregator -lgmpxx -lgmp
+	$(CC) $(CFLAGS) sortedcountaggregator.o -o sortedcountaggregator -lgmpxx -lgmp
 
 sortedcountaggregator.o: sortedcountaggregator.cpp
-	$(CC) $(CFLAG) -c sortedcountaggregator.cpp
+	$(CC) $(CFLAGS) -c sortedcountaggregator.cpp
 
 clean:
 	rm -f GeneratePatterns

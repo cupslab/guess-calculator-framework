@@ -68,7 +68,8 @@ bool ReadLookupTableLine(FILE *fileptr,
 
     // Process probability
     char *probability_str;
-    probability_str = strtok(buf, "\t");
+    char *tokstate;
+    probability_str = strtok_r(buf, "\t", &tokstate);
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
@@ -83,7 +84,7 @@ bool ReadLookupTableLine(FILE *fileptr,
 
     // Process guess number next
     char *guess_number_ptr;
-    guess_number_ptr = strtok(NULL, "\t");
+    guess_number_ptr = strtok_r(NULL, "\t", &tokstate);
     if (guess_number_ptr == NULL) {
       goto error;  // strtok failed!
     } else {
@@ -94,7 +95,7 @@ bool ReadLookupTableLine(FILE *fileptr,
 
     // The remainder of the line will be the pattern string
     char *pattern_string_ptr;
-    pattern_string_ptr = strtok(NULL, "\n");
+    pattern_string_ptr = strtok_r(NULL, "\n", &tokstate);
     if (pattern_string_ptr == NULL) {
       goto error;  // strtok failed!
     } else {

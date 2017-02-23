@@ -50,18 +50,18 @@ public:
   }
   double getProbability() { return probability_; }
   // Return the "first" string of the terminal (used for string representation)
-  virtual std::string getFirstString() const = 0;
+  virtual const std::string& getFirstString() const = 0;
 
   // Look up a terminal in this group
   // Returns a LookupData struct with relevant fields set
-  virtual LookupData* lookup(const std::string& terminal) const = 0;
+  virtual LookupData* lookup(const char *terminal) const = 0;
 
   // Return just the "index" of the given string in the terminal group (-1 if 
   // no match).  
   // By convention, mpz_t types are not returned, but are passed by reference.
   // See http://stackoverflow.com/a/13396028
   virtual void indexInTerminalGroup(mpz_t result, 
-                                    const std::string& teststring) const = 0;
+                                    const char *teststring) const = 0;
 
   class TerminalGroupStringIterator {
   public:
@@ -74,7 +74,7 @@ public:
     // Check if past the end
     virtual bool isEnd() const = 0;
     // Return the terminal string at the current iterator state
-    virtual std::string getCurrentString() const = 0;
+    virtual const std::string& getCurrentString() const = 0;
   };
 
   // Return a string iterator object

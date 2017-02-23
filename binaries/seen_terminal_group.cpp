@@ -16,6 +16,10 @@
 // Includes not covered in header file
 #include <cstdlib>
 #include <cctype>  // for toupper
+#include <string.h> // strncpy
+#include <assert.h>
+
+#include "big_count.h"
 #include "grammar_tools.h"
 
 #include "seen_terminal_group.h"
@@ -28,18 +32,17 @@ void SeenTerminalGroup::loadFirstString() {
     exit(EXIT_FAILURE);
   }
 
-  char read_buffer[1024];
   unsigned int bytes_read;
-  if (!grammartools::ReadLineFromCharArray(group_data_start_, group_data_size_,
-                                           read_buffer, bytes_read)) {
+  if (!grammartools::ReadLineFromCharArray2(group_data_start_,
+                                           bytes_read)) {
     fprintf(stderr, "Failed read in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
   }    
 
-  std::string terminal, source_ids;
+  const char *terminal, *source_ids;
   double probability;
-  if (!grammartools::ParseNonterminalLine(read_buffer, terminal,
-                                          probability, source_ids)) {
+  if (!grammartools::ParseNonterminalLine(group_data_start_, bytes_read, &terminal,
+                                          probability, &source_ids)) {
     fprintf(stderr,
       "Line could not be parsed in SeenTerminalGroup::loadFirstString!\n");
     exit(EXIT_FAILURE);
@@ -50,30 +53,32 @@ void SeenTerminalGroup::loadFirstString() {
   //
   // Check for a size mismatch -- we only check this here, in loadFirstString
   // and assume that this function will work for all other modifications
-  if (terminal.size() != out_representation_.size()) {
+  if (strlen(terminal) != out_representation_.size()) {
     fprintf(stderr,
       "out_representation could not be matched in "
       "SeenTerminalGroup::loadFirstString!\n"
       "out_representation_: %s\nterminal: %s\n",
-      out_representation_.c_str(), terminal.c_str());
+      out_representation_.c_str(), terminal);
     exit(EXIT_FAILURE);    
   }
 
   // Check if modifications are needed and record
+  std::string terminalstr(terminal);
+
   if (out_representation_.find('U') != std::string::npos) {
     out_matching_needed_ = true;
-    matchOutRepresentation(terminal);
+    matchOutRepresentation(terminalstr);
   } else {
     out_matching_needed_ = false;
   }
 
-  first_string_ = terminal;
+  first_string_ = terminalstr;
 }
 
 
 
 // Simple getter function for first string
-std::string SeenTerminalGroup::getFirstString() const {
+const std::string& SeenTerminalGroup::getFirstString() const {
   return first_string_;
 }
 
@@ -91,26 +96,37 @@ std::string SeenTerminalGroup::getFirstString() const {
 //
 // Die on failure to parse source_ids
 //
-LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
+LookupData* SeenTerminalGroup::lookup(const char *terminal) const {
+  // just for debug output
+  char space[1024];
+  char *read_buffer = space;
+
   LookupData *lookup_data = new LookupData;
 
-  mpz_init_set_ui(lookup_data->index, 0);
+  mpz_init(lookup_data->index);
+  unsigned long int index = 0;
+  unsigned long int terminalsSize = mpz_get_ui(terminals_size_);
   const char* current_data_position = group_data_start_;
   size_t bytes_remaining = group_data_size_;
 
   // Iterate over the group, looking for the input string
-  while(mpz_cmp(lookup_data->index, terminals_size_) < 0) {
-    char read_buffer[1024];
+  while(index < terminalsSize) {
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(current_data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(current_data_position,
+                                        bytes_read);
     // Parse the line
-    std::string read_terminal, source_ids;
+    const char *read_terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, read_terminal,
-                                       probability, source_ids);
+    // just for debug output
+    assert(bytes_read + 1 <= 1024);
+    strncpy(read_buffer, current_data_position, bytes_read);
+    read_buffer[bytes_read] = 0;
 
-    if (read_terminal == terminal) {
+    grammartools::ParseNonterminalLine(current_data_position, bytes_read, &read_terminal,
+                                       probability, &source_ids);
+
+    auto len = strlen(terminal);
+    if ((len == strlen(read_terminal)) && (strncmp(terminal, read_terminal, len) == 0)) {
       lookup_data->parse_status = kCanParse;
       if (probability_ != probability) {
         fprintf(stderr,
@@ -126,14 +142,15 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
         fprintf(stderr,
           "Could not parse source ids %s in line %s in "
           "SeenTerminalGroup::lookup!\n",
-          source_ids.c_str(), read_buffer);
+          source_ids, read_buffer);
         exit(EXIT_FAILURE);
       }
+      mpz_set_ui(lookup_data->index, index);
       return lookup_data;
     }
 
     // Increment counters
-    mpz_add_ui(lookup_data->index, lookup_data->index, 1);
+    index++;
     current_data_position += bytes_read;
     bytes_remaining -= bytes_read;
   }
@@ -152,7 +169,7 @@ LookupData* SeenTerminalGroup::lookup(const std::string& terminal) const {
 // This function simply calls lookup, and then returns just the index
 //
 void SeenTerminalGroup::indexInTerminalGroup(mpz_t result, 
-                                             const std::string& teststring) const {
+                                             const char *teststring) const {
   LookupData *lookup_data = lookup(teststring);
   mpz_init(result);
   mpz_set(result, lookup_data->index);
@@ -200,15 +217,14 @@ void SeenTerminalGroup::SeenTerminalGroupStringIterator::
 bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
     increment() {
   if (!isEnd()) {
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(current_group_position_, bytes_remaining_,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(current_group_position_,
+                                        bytes_read);
     // Parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(current_group_position_, bytes_read, &terminal,
+                                       probability, &source_ids);
     // Adjust class variables
     current_group_position_ += bytes_read;
     // Adjust bytes_remaining_ but make sure we don't overflow the unsigned in
@@ -217,11 +233,12 @@ bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
     else
       bytes_remaining_ = 0;
 
+    std::string terminalstr(terminal);
     // Uppercase the terminal in the correct positions, if needed
     if (parent_->out_matching_needed_)
-      parent_->matchOutRepresentation(terminal);
+      parent_->matchOutRepresentation(terminalstr);
 
-    current_string_ = terminal.c_str();
+    current_string_ = terminalstr.c_str();
     return true;
   }
   return false;
@@ -235,7 +252,7 @@ bool SeenTerminalGroup::SeenTerminalGroupStringIterator::
 
 
 // Simple getter
-std::string SeenTerminalGroup::SeenTerminalGroupStringIterator::
+const std::string& SeenTerminalGroup::SeenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }

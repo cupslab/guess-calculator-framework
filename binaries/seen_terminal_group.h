@@ -47,13 +47,13 @@ public:
   };
 
   // Return a LookupData struct with relevant fields set for the given terminal
-  LookupData* lookup(const std::string& terminal) const;
+  LookupData* lookup(const char *terminal) const;
 
   // Return the "index" of the given string in the terminal group (-1 if no match)
-  void indexInTerminalGroup(mpz_t result, const std::string& teststring) const;
+  void indexInTerminalGroup(mpz_t result, const char *teststring) const;
 
   // Return the "first" string of the terminal (used for string representation)
-  std::string getFirstString() const;
+  const std::string& getFirstString() const;
 
   class SeenTerminalGroupStringIterator : public TerminalGroupStringIterator {
   public:
@@ -63,7 +63,7 @@ public:
     void restart();
     bool increment();
     bool isEnd() const;
-    std::string getCurrentString() const;
+    const std::string& getCurrentString() const;
 
   private:
     const SeenTerminalGroup* const parent_;

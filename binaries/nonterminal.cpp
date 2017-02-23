@@ -23,13 +23,15 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <memory>
+#include <unordered_map>
 
+#include "big_count.h"
 #include "grammar_tools.h"
 #include "seen_terminal_group.h"
 #include "unseen_terminal_group.h"
 
 #include "nonterminal.h"
-
 
 // Destructor for Nonterminal -- checks whether variables were initialized 
 // before deleting them
@@ -40,10 +42,16 @@ Nonterminal::~Nonterminal() {
       delete terminal_groups_[i];
     delete[] terminal_groups_;
   // Unmap the terminal data file
+  // XXXstroucki mmaps disappear on exit, beware that we reuse the
+  // char* now. Better to use a counted type.
   if (terminal_data_ != NULL)
     munmap(terminal_data_, terminal_data_size_);
 }
 
+struct stringsize {
+  char *string;
+  size_t size;
+};
 
 // Init routine will use the given representation to find the correct terminals
 // file in the terminals_folder and memory map it.  It will then make a pass
@@ -58,6 +66,9 @@ Nonterminal::~Nonterminal() {
 // Returns true on success
 bool Nonterminal::loadNonterminal(const std::string& representation,
                                   const std::string& terminals_folder) {
+
+  // protect if multithreaded
+  static std::unordered_map<std::string, struct stringsize>mapped_data;
   representation_ = representation;
   // Create "terminal" representation
   terminal_representation_ = representation;
@@ -66,6 +77,9 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
                'U',
                'L');
 
+
+  auto it = mapped_data.find(terminal_representation_);
+  if (it == mapped_data.end()) {
 
   // Open the terminal file with open
   int file_handle;
@@ -112,6 +126,8 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     static_cast<char *>(mmap(static_cast<caddr_t>(0), 
                              terminal_data_size_, 
                              PROT_READ, MAP_SHARED, file_handle, 0));
+  // waste not want not
+  close(file_handle);
   if (static_cast<void *>(terminal_data_) == MAP_FAILED) {
     perror("Error in memory mapping terminal data file: ");
     fprintf(stderr,
@@ -120,7 +136,17 @@ bool Nonterminal::loadNonterminal(const std::string& representation,
     return false;
   }
 
-  // With temrinal data initialized, can now initialize terminal groups
+  struct stringsize value = {terminal_data_, terminal_data_size_};
+  mapped_data.insert({terminal_representation_, value});
+
+  it = mapped_data.find(terminal_representation_);
+  } else {
+    auto& value = it->second;
+    terminal_data_ = value.string;
+    terminal_data_size_ = value.size;
+  }
+
+  // With terminal data initialized, can now initialize terminal groups
   if (!initializeTerminalGroups())
     return false;
 
@@ -157,14 +183,15 @@ bool Nonterminal::initializeTerminalGroups() {
   char *group_start = terminal_data_;
   uint64_t current_group_number = 0;
   mpz_t current_group_size;
-  mpz_init_set_ui(current_group_size, 1);
+  mpz_init(current_group_size);
+
+  std::shared_ptr<BigCount> groupSize = std::make_shared<BigCount>(1);
 
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and move forward
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       in_seen_groups = false;
@@ -176,10 +203,10 @@ bool Nonterminal::initializeTerminalGroups() {
     }
 
     // Parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    if (!grammartools::ParseNonterminalLine(read_buffer, terminal,
-                                            probability, source_ids)) {
+    if (!grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                            probability, &source_ids)) {
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         data_position - terminal_data_);
@@ -201,24 +228,26 @@ bool Nonterminal::initializeTerminalGroups() {
     // If at the end of a group, initalize a new Terminal Group, else
     // increment the current group size.
     if (is_end_of_group) {
-      if (in_seen_groups)
+      if (in_seen_groups) {
+        BigCount::get(current_group_size, *groupSize.get());
         terminal_groups_[current_group_number] = 
           new SeenTerminalGroup(terminal_data_, probability, 
                                 current_group_size, representation_,
                                 group_start,
                                 data_position - group_start + bytes_read);
-      else
+      } else {
         // For unseen groups, the source_ids field will contain a generator mask
         terminal_groups_[current_group_number] =
           new UnseenTerminalGroup(terminal_data_, probability,
                                   source_ids, representation_,
                                   terminal_data_size_);
+      }
       // Set group_start to the start of the next line
       group_start = data_position + bytes_read;
       ++current_group_number;
-      mpz_set_ui(current_group_size, 1);
+      groupSize = std::make_shared<BigCount>(1);
     } else {
-      mpz_add_ui(current_group_size, current_group_size, 1);
+      BigCount::add(*groupSize.get(), *groupSize.get(), 1);
     }
 
     // Move counters forward
@@ -267,7 +296,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
       inputstring_representation.push_back('D');
     else if( inputstring[i] == 1 )
       // If the \x01 character is found, give up
-      return false;
+      return NULL;
     else
       inputstring_representation.push_back('S');
   }
@@ -289,7 +318,7 @@ TerminalLookupData* Nonterminal::lookup(const std::string& inputstring) const {
                  downcased_string.begin(), ::tolower);
   for (uint64_t i = 0; i < terminal_groups_size_; ++i) {
     // If index is not -1, then this terminal group can produce the input string
-    LookupData *terminal_lookup = terminal_groups_[i]->lookup(downcased_string);
+    LookupData *terminal_lookup = terminal_groups_[i]->lookup(downcased_string.c_str());
 
     if (terminal_lookup->parse_status & kCanParse) {
       // Copy terminal_lookup into lookup_data
@@ -342,7 +371,7 @@ uint64_t Nonterminal::countTerminalGroups() const {
 // When returning values based on a terminal group index, die if the index
 // is outside of the range of available terminal groups
 //
-std::string Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
+const std::string& Nonterminal::getFirstStringOfGroup(uint64_t group_index) const {
   if (group_index >= terminal_groups_size_) {
     fprintf(stderr,
       "TerminalGroup index is outside of available range in "
@@ -400,8 +429,7 @@ TerminalGroup::TerminalGroupStringIterator*
 
 // Simple getter function that returns a copy of the USLD representation for
 // the nonterminal
-std::string Nonterminal::getRepresentation() const {
-  std::string representation(representation_);
-  return representation;
+const std::string& Nonterminal::getRepresentation() const {
+  return representation_;
 }
 

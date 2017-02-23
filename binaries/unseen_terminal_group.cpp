@@ -18,10 +18,14 @@
 #include <cstdlib>
 #include <cstdint>
 #include <climits>
+#include <memory> // shared
 #include "grammar_tools.h"
 #include "bit_array.h"
 
+#include <string.h>
+
 #include "unseen_terminal_group.h"
+#include "big_count.h"
 
 // Non-literal static class members cannot be initialized in the class body
 const std::string UnseenTerminalGroup::kGeneratorSymbols = 
@@ -73,32 +77,30 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   // Iterate over terminal_data_ until we reach a blank line
   const char *data_position = terminal_data_;
   size_t bytes_remaining = terminal_data_size_;
-  mpz_t seen_terminals_size, seen_terminals_cant_be_generated;
-  mpz_init_set_ui(seen_terminals_size, 0);  
-  mpz_init_set_ui(seen_terminals_cant_be_generated, 0);  
+  unsigned long int seen_terminals_size = 0;
+  unsigned long int seen_terminals_cant_be_generated = 0;
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and terminate
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       break;
     }
 
     // Else parse the line
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                       probability, &source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
-    if (canGenerateTerminal(terminal))
-      mpz_add_ui(seen_terminals_size, seen_terminals_size, 1);
-    else
-      mpz_add_ui(seen_terminals_cant_be_generated, 
-                 seen_terminals_cant_be_generated, 1);
+    if (canGenerateTerminal(terminal)) {
+      seen_terminals_size++;
+    } else {
+      seen_terminals_cant_be_generated++;
+    }
 
     // Move counters forward
     data_position += bytes_read;
@@ -106,9 +108,12 @@ bool UnseenTerminalGroup::processSeenTerminals() {
   }  // end while (bytes_remaining > 0)
 
   // Set total_terminals_ and terminals_size_
+  // do they have to be mp ints? if so, they couldn't fit in a file.
   initTotalTerminals();
-  if (mpz_cmp(seen_terminals_size, total_terminals_) >= 0) {
-    char *sts_string = mpz_get_str(NULL, 10, seen_terminals_size);
+  mpz_t sts;
+  mpz_init_set_ui(sts, seen_terminals_size);
+  if (mpz_cmp(sts, total_terminals_) >= 0) {
+    char *sts_string = mpz_get_str(NULL, 10, sts);
     char *tt_string  = mpz_get_str(NULL, 10, total_terminals_);
     fprintf(stderr, "Unexpected error!\n"
                     "seen_terminals_size exceeds total_terminals_ found!\n"
@@ -117,11 +122,10 @@ bool UnseenTerminalGroup::processSeenTerminals() {
                     sts_string, tt_string);
     return false;
   }
-  mpz_sub(terminals_size_, total_terminals_, seen_terminals_size);
+  mpz_sub(terminals_size_, total_terminals_, sts);
   probability_ = total_probability_mass_ / mpz_get_d(terminals_size_);
   // Cleanup intermediate BigInts
-  mpz_clear(seen_terminals_size);
-  mpz_clear(seen_terminals_cant_be_generated);
+  mpz_clear(sts);
 
 
   // Finally, we need to determine the value of the first unseen string.
@@ -220,8 +224,8 @@ void UnseenTerminalGroup::initCharacterLookups() {
     d_int_to_char_[i - '0'] = i;
   }
 
-  for (int i = 0; i < kGeneratorSymbols.size(); ++i)
-    s_char_to_int_[ kGeneratorSymbols[i] ] = i;
+  for (unsigned int i = 0; i < kGeneratorSymbols.size(); ++i)
+    s_char_to_int_[ (unsigned char)kGeneratorSymbols[i] ] = i;
 }
 
 
@@ -232,7 +236,7 @@ void UnseenTerminalGroup::initCharacterLookups() {
 //
 void UnseenTerminalGroup::initTotalTerminals() {
   mpz_init(total_terminals_);
-  mpz_set_ui(total_terminals_, 1);
+  BigCount totterm(1);
   for (unsigned int i = 0; i < generator_mask_.size(); ++i) {
     unsigned int characters_produced;
     switch (generator_mask_[i]) {
@@ -251,29 +255,30 @@ void UnseenTerminalGroup::initTotalTerminals() {
                         generator_mask_.c_str(), out_representation_.c_str());
         exit(EXIT_FAILURE);
     }
-    mpz_mul_ui(total_terminals_, total_terminals_, characters_produced);
+    BigCount::mul(totterm, totterm, characters_produced);
   }
+  BigCount::get(total_terminals_, totterm);
 }
 
 
 // Given a terminal, determine if it can be produced *by the generator mask*
-bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const {
-  if (terminal.size() != generator_mask_.size())
+bool UnseenTerminalGroup::canGenerateTerminal(const char *terminal) const {
+  if (strlen(terminal) != generator_mask_.size())
     return false;
 
   // Iterate over the generator mask and check each character of the terminal
   for (unsigned int i = 0; i < generator_mask_.size(); ++i) {
     switch (generator_mask_[i]) {
       case 'L':
-        if (l_char_to_int_[ terminal[i] ] == -1)
+        if (l_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       case 'D':
-        if (d_char_to_int_[ terminal[i] ] == -1)
+        if (d_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       case 'S':
-        if (s_char_to_int_[ terminal[i] ] == -1)
+        if (s_char_to_int_[ (unsigned char)terminal[i] ] == -1)
           return false;
         break;
       default:
@@ -302,29 +307,35 @@ bool UnseenTerminalGroup::canGenerateTerminal(const std::string& terminal) const
 // and return the current index.  The index returned in this case will be
 // above region_end, but its value should be ignored!
 //
-void UnseenTerminalGroup::terminalIndex(mpz_t result,
-                                        const std::string& terminal, 
+void UnseenTerminalGroup::terminalIndex(mpz_t resultout,
+                                        const char *terminal, 
                                         mpz_t region_end /*= NULL*/) const {
-  mpz_init_set_ui(result, 0);
+  // 15% of values repeat
+  BigCount result;
+  std::shared_ptr<BigCount> end;
+  if (region_end != NULL) {
+    end = std::make_shared<BigCount>(region_end);
+  }
 
   // Iterate over the generator mask and check each character of the terminal
   // Since we assume canGenerateTerminal has already been called, we deduce
   // that terminal and generator_mask_ are the same size
+  // XXXstroucki int?
   for (int i = generator_mask_.size() - 1; i >= 0; --i) {
     unsigned int character_base;
     int character_index;
     switch (generator_mask_[i]) {
       case 'L':
         character_base = 26;
-        character_index = l_char_to_int_[ terminal[i] ];
+        character_index = l_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       case 'D':
         character_base = 10;
-        character_index = d_char_to_int_[ terminal[i] ];
+        character_index = d_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       case 'S':
         character_base = kGeneratorSymbols.size();
-        character_index = s_char_to_int_[ terminal[i] ];
+        character_index = s_char_to_int_[ (unsigned char)terminal[i] ];
         break;
       default:
         fprintf(stderr, "generator_mask_: %s contains unexpected characters "
@@ -338,20 +349,23 @@ void UnseenTerminalGroup::terminalIndex(mpz_t result,
                       "terminal: %s cannot be generated!\n"
                       "  In terminalIndex with out_representation_: %s!\n",
                       i, generator_mask_.c_str(), terminal[i],
-                      terminal.c_str(), out_representation_.c_str());
+                      terminal, out_representation_.c_str());
       exit(EXIT_FAILURE);      
     }
     // Use the formula from: http://stackoverflow.com/a/759319
-    mpz_mul_ui(result, result, character_base);
-    mpz_add_ui(result, result, character_index);
+    BigCount::mul(result, result, character_base);
+    BigCount::add(result, result, character_index);
 
     // If the current index is outside the region, stop here
     if (region_end != NULL) {
-      if (mpz_cmp(result, region_end) > 0) {
-        return;
+      if (BigCount::cmp(result, *end.get()) > 0) {
+        break;
       }
     }
   }
+
+  BigCount::get(resultout, result);
+  return;
 }
 
 
@@ -460,25 +474,28 @@ void UnseenTerminalGroup::findUnseenTerminals(
   // we use the region_end argument of terminalIndex (see below).
   const char *data_position = terminal_data_;
   size_t bytes_remaining = terminal_data_size_;
+
+  // init this once, rely on terminalIndex overwriting it
+  mpz_t terminal_index;
+  mpz_init(terminal_index);
+
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     if (bytes_read == 1) {
       break;
     }
-    std::string terminal, source_ids;
+    const char *terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &terminal,
+                                       probability, &source_ids);
 
     // If this terminal can be generated, get its index and store in
     // the BitArray if the index of the terminal is within our region
     // of consideration
     if (canGenerateTerminal(terminal)) {
-      mpz_t terminal_index;
       terminalIndex(terminal_index, terminal, region_end);
       if (mpz_cmp(terminal_index, region_end) <= 0 &&
           mpz_cmp(region_start, terminal_index) <= 0) {
@@ -487,13 +504,13 @@ void UnseenTerminalGroup::findUnseenTerminals(
         unsigned long int bitarray_index = mpz_get_ui(terminal_index);
         found_terminals->markIndex(bitarray_index);
       }
-      // Clear the allocated BigInt before exiting
-      mpz_clear(terminal_index);
     }
     // Move counters forward
     data_position += bytes_read;
     bytes_remaining -= bytes_read;
   }  // end while (bytes_remaining > 0)
+  // Clear the allocated BigInt before exiting
+  mpz_clear(terminal_index);
   mpz_clear(region_end);
   
   return;
@@ -501,7 +518,7 @@ void UnseenTerminalGroup::findUnseenTerminals(
 
 
 // Simple getter function for first string
-std::string UnseenTerminalGroup::getFirstString() const {
+const std::string& UnseenTerminalGroup::getFirstString() const {
   return first_string_;
 }
 
@@ -517,12 +534,13 @@ std::string UnseenTerminalGroup::getFirstString() const {
 // the other methods of this class.  Use terminalIndex on the input string,
 // and then subtract the number of seen terminals with a lower index.
 //
-LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
+LookupData* UnseenTerminalGroup::lookup(const char *terminal) const {
   LookupData *lookup_data = new LookupData;
 
-  if (canGenerateTerminal(terminal))
+  if (canGenerateTerminal(terminal)) {
+    mpz_init(lookup_data->index);
     terminalIndex(lookup_data->index, terminal);
-  else {
+  } else {
     lookup_data->parse_status = kTerminalNotFound | kTerminalCantBeGenerated;
     lookup_data->probability = -1;    
     mpz_init(lookup_data->index);
@@ -534,26 +552,29 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
   size_t bytes_remaining = terminal_data_size_;
   mpz_t lower_count;
   mpz_init_set_ui(lower_count, 0);
+
+  // init terminal_index outside the loop, rely on terminalIndex overwriting it
+  mpz_t terminal_index;
+  mpz_init(terminal_index);
+
   while (bytes_remaining > 0) {
     // Read the current line
-    char read_buffer[1024];
     unsigned int bytes_read;
-    grammartools::ReadLineFromCharArray(data_position, bytes_remaining,
-                                        read_buffer, bytes_read);
+    grammartools::ReadLineFromCharArray2(data_position,
+                                        bytes_read);
     // If current line is blank, expect unseen terminals next and terminate
     if (bytes_read == 1) {  // Blank line = just the newline character was read
       break;
     }
     // Else parse the line
-    std::string read_terminal, source_ids;
+    const char *read_terminal, *source_ids;
     double probability;
-    grammartools::ParseNonterminalLine(read_buffer, read_terminal,
-                                       probability, source_ids);
+    grammartools::ParseNonterminalLine(data_position, bytes_read, &read_terminal,
+                                       probability, &source_ids);
 
     // Check if this terminal can actually be produced by the generator mask
     if (canGenerateTerminal(read_terminal)) {
       // Check if the index of this terminal is less than our index
-      mpz_t terminal_index;
       terminalIndex(terminal_index, read_terminal);
       int compare_result = mpz_cmp(terminal_index, lookup_data->index);
       if (compare_result < 0) {
@@ -561,11 +582,12 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
       } else if (compare_result == 0) {
         // Our input string matches a seen terminal, so return -1, but perform
         // a sanity check to make sure things are working properly.
-        if (terminal != read_terminal) {
-          fprintf(stderr, "string: %s has same index as terminal: %s"
+        auto len = strlen(terminal);
+        if ((len != strlen(read_terminal)) || (strncmp(terminal, read_terminal, len) != 0)) {
+          fprintf(stderr, "string: %s has same index as terminal: %s "
                           "in indexInTerminalGroup with out_representation_: %s"
                           " but strings are not equal!\n",
-                          terminal.c_str(), read_terminal.c_str(),
+                          terminal, read_terminal,
                           out_representation_.c_str());
           exit(EXIT_FAILURE);
         }
@@ -573,10 +595,10 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
         lookup_data->parse_status = kTerminalNotFound | kTerminalCollision;
         lookup_data->probability = -1;    
         mpz_set_si(lookup_data->index, -1);
+        mpz_clear(terminal_index);
         mpz_clear(lower_count);
         return lookup_data;
       }      
-      mpz_clear(terminal_index);
     }
     // Move counters forward
     data_position += bytes_read;
@@ -587,6 +609,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
   lookup_data->probability = probability_;    
   mpz_sub(lookup_data->index, lookup_data->index, lower_count);
   mpz_clear(lower_count);
+  mpz_clear(terminal_index);
   // Set source id
   lookup_data->source_ids.insert("UNSEEN");
   return lookup_data;
@@ -599,7 +622,7 @@ LookupData* UnseenTerminalGroup::lookup(const std::string& terminal) const {
 // This function simply calls lookup, and then returns just the index
 // 
 void UnseenTerminalGroup::indexInTerminalGroup(mpz_t result,
-                                               const std::string& teststring) const {
+                                               const char *teststring) const {
   LookupData *lookup_data = lookup(teststring);
   mpz_init(result);
   mpz_set(result, lookup_data->index);
@@ -717,7 +740,7 @@ bool UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
 
 
 // Simple getter
-std::string UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
+const std::string& UnseenTerminalGroup::UnseenTerminalGroupStringIterator::
     getCurrentString() const {
   return current_string_;
 }

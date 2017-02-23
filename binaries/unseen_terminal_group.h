@@ -61,13 +61,13 @@ public:
   }
 
   // Return a LookupData struct with relevant fields set for the given terminal
-  LookupData* lookup(const std::string& terminal) const;
+  LookupData* lookup(const char *terminal) const;
 
   // Return the "index" of the given string in the terminal group (-1 if no match)
-  void indexInTerminalGroup(mpz_t result, const std::string& teststring) const;
+  void indexInTerminalGroup(mpz_t result, const char *teststring) const;
 
   // Return the "first" string of the terminal (used for string representation)
-  std::string getFirstString() const;
+  const std::string& getFirstString() const;
 
 
   class UnseenTerminalGroupStringIterator : public TerminalGroupStringIterator {
@@ -78,7 +78,7 @@ public:
     void restart();
     bool increment();
     bool isEnd() const;
-    std::string getCurrentString() const;
+    const std::string& getCurrentString() const;
 
   private:
     const UnseenTerminalGroup* const parent_;
@@ -104,7 +104,7 @@ private:
   //
   // Since terminal_data_ is all lowercase, this function should only be given
   // downcased strings.
-  bool canGenerateTerminal(const std::string& terminal) const;
+  bool canGenerateTerminal(const char *terminal) const;
 
   // Given a terminal that can be generated, return its index, with an optional
   // stopping criteria.  Note that this will not return the same value as the
@@ -114,7 +114,7 @@ private:
   // can be generated.  In contrast, indexInTerminalGroup will subtract out
   // seen terminals from the returned index.
   void terminalIndex(mpz_t result, 
-                     const std::string& terminal, 
+                     const char *terminal, 
                      mpz_t region_end = NULL) const;
   
   // Given an index in terminal space, generate a terminal

@@ -73,14 +73,14 @@ public:
   bool canProduceTerminal(const std::string& inputstring) const;
 
   // Routines for getting values from the terminal groups
-  std::string getFirstStringOfGroup(uint64_t group_index) const;
+  const std::string& getFirstStringOfGroup(uint64_t group_index) const;
   double getProbabilityOfGroup(uint64_t group_index) const;
   void countStringsOfGroup(mpz_t result, uint64_t group_index) const;
   TerminalGroup::TerminalGroupStringIterator* getStringIteratorForGroup(
       uint64_t group_index) const;
 
   // getter methods
-  std::string getRepresentation() const;
+  const std::string& getRepresentation() const;
 
 private:
   // Part of the delayed initialization process -- called from LoadNonterminal
