@@ -4,14 +4,14 @@
 
 ## 1 Initial test
 
-A small experiment is provided in the [minibasic6](example conditions/minibasic6) directory. After the experiment runs, you can verify the output by comparing it to the [reference results](reference results/minibasic6).
+A small experiment is provided in the [minibasic6](example%20conditions/minibasic6) directory. After the experiment runs, you can verify the output by comparing it to the [reference results](reference%20results/minibasic6).
 
 To run an experiment:
 
 1. Process the input files into training and test corpora
 
   ```
-  perl create_training_and_test_corpora.pl -d processed/minibasic6 minibasic6 example\ conditions/minibasic6/configs/minibasic6.dat 2>>minibasic6.log
+  perl create_training_and_test_corpora.pl -d processed/minibasic6 example\ conditions/minibasic6/configs/minibasic6.dat 2>>minibasic6.log
   ```
 
   This command places the processed files into a directory called `processed/minibasic6` off the current directory.  If no directory is specified, files will be placed in a directory called `working`.
@@ -51,11 +51,11 @@ To run an experiment:
 
   This will read in any lookupresults and totalcounts files in the current directory and plot guess numbers.
 
-  Compare your results files: `lookupresults.minibasic6-1e-12` and `totalcounts.minibasic6-1e-12`, to the [reference results](reference results/minibasic6).  You should also compare the plots visually (pdf file contents will vary due to timestamps).
+  Compare your results files: `lookupresults.minibasic6-1e-12` and `totalcounts.minibasic6-1e-12`, to the [reference results](reference%20results/minibasic6).  You should also compare the plots visually (pdf file contents will vary due to timestamps).
 
 #### Additional example
 
-An additional reference experiment is provided in the [minibasic6_with_improvements](example conditions/minibasic6_with_improvements) directory.  It takes about 75 minutes to run and evaluates 2,993,521,412,025 guesses.
+An additional reference experiment is provided in the [minibasic6_with_improvements](example%20conditions/minibasic6_with_improvements) directory.  It takes about 75 minutes to run and evaluates 2,993,521,412,025 guesses.
 
 
 #### Reproducible results
@@ -73,7 +73,7 @@ To conduct an experiment, you need:
 
 - Filters for your policy
 
-  This is typically a set of three filters: a training filter for your policy, a "remainder" training filter which accepts all passwords that do not comply with your policy, and a test filter.  The first filter is used for structures training, while the remainder filter takes the remainder of the training data that does not comply with the target policy and makes it available as terminals.  Test filters expect plain files while training filters expect "wordfreq" files. See [here](#training-data). 
+  This is typically a set of three filters: a training filter for your policy, a "remainder" training filter which accepts all passwords that do not comply with your policy, and a test filter.  The first filter is used for structures training, while the remainder filter takes the remainder of the training data that does not comply with the target policy and makes it available as terminals.  Test filters expect plain files while training filters expect "wordfreq" files. See [heref#training-data). 
 
 - (Optional) Tokenizers for your experiment
 
@@ -122,7 +122,7 @@ Test data can also be in single-column format if the `convert_from_single_column
 
 ### Writing a configuration file
 
-Configuration files must be valid Perl scripts and are evaluated using `Safe::rdo`.  Look at the [minibasic6 example](example conditions/minibasic6/configs/minibasic6.dat) for a simple example including comments. The configuration is read out of the hash `%TOP`. Below is a reference to the keys that can be included in `%TOP`.  Keys followed by * are required.
+Configuration files must be valid Perl scripts and are evaluated using `Safe::rdo`.  Look at the [minibasic6 example](example%20conditions/minibasic6/configs/minibasic6.dat) for a simple example including comments. The configuration is read out of the hash `%TOP`. Below is a reference to the keys that can be included in `%TOP`.  Keys followed by * are required.
 
 - `name`*
 
