@@ -1,5 +1,5 @@
 // grammar_tools.cpp - a collection of miscellaneous, low-level functions
-//   used when reading and parsing the grammar *on-disk* into higher-level 
+//   used when reading and parsing the grammar *on-disk* into higher-level
 //   objects
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri May 30 18:35:30 2014
-// 
+//
 
 
 // Includes not covered in header file
@@ -72,8 +72,8 @@ int SkipStructuresHeader(FILE *fileptr) {
 
 // Read and parse a line from the structures file, checking for proper format.
 // On failure, output the offending line to stderr.
-bool ReadStructureLine(FILE *fileptr, 
-                       std::string& structure, 
+bool ReadStructureLine(FILE *fileptr,
+                       std::string& structure,
                        double& probability,
                        std::string& source_ids) {
   char buf[1024];
@@ -86,7 +86,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (structureptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       structure = structureptr;
     }
@@ -97,7 +97,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Read in probability as a hex float and assign to out-parameter      
+      // Read in probability as a hex float and assign to out-parameter
       probability = strtod(probability_str, NULL);
 
       // Check that probability is well-formed
@@ -112,7 +112,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (sourceidsptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       source_ids = sourceidsptr;
     }
@@ -125,7 +125,7 @@ bool ReadStructureLine(FILE *fileptr,
 
  error:
   fprintf(stderr, "Error in line: \"%s\" in structures file!\n", buf);
-  return false;    
+  return false;
 }
 
 // Simple function to remove the \x01 character from the input string and
@@ -142,7 +142,7 @@ std::string StripBreakCharacterFromTerminal(const std::string& inputstring) {
   return unbroken;
 }
 
-// Given a source pointer of size source_length, return 
+// Given a source pointer of size source_length, return
 // length of a line
 bool ReadLineFromCharArray2(const char *source,
                             unsigned int &size) {
@@ -157,7 +157,7 @@ bool ReadLineFromCharArray2(const char *source,
   size = length;
   return true;
 }
-  
+
 // Given a source pointer of size source_length, place one line from the
 // source into the destination and provide the number of bytes read.
 //
@@ -173,9 +173,9 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     bytes_to_read = source_length;
     end_of_string = true;
   }
-  
+
   // "Read" the characters by copying them into destination and check for errors
-  char *temp_position = 
+  char *temp_position =
     static_cast<char *> (memccpy(destination, source, '\n', bytes_to_read));
 
   // Allow that the source might not end in a newline only if we consume the
@@ -184,7 +184,7 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     fprintf(stderr,
       "Newline character not found with read where source_length was %zu\n",
       source_length);
-    return false;    
+    return false;
   }
 
   // memccpy returns a pointer to just past the newline in destination unless
@@ -323,7 +323,7 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         current_position - source);
-      return false;          
+      return false;
     }
 
     // Check for a change in probability
@@ -394,7 +394,7 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   double current_probability, next_probability;
   if (!ParseNonterminalLine(source, firstlength, &terminal,
                             current_probability, &source_ids)) {
-    return false;         
+    return false;
   }
   if (!ParseNonterminalLine(peek, peeklength, &terminal,
                             next_probability, &source_ids)) {
