@@ -209,19 +209,25 @@ struct pnldata {
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
 // out the fields that are returned in the out-parameters.
-// 
+//
 // NOTE: This function uses strtok which destroys that source buffer.
-// 
+//
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(const char *source, const unsigned int length,
-                          const char **terminal, 
+                          const char **terminal,
                           double& probability,
                           const char **source_ids) {
+
+  // most terminal rules have <12.8m entries
+  // except for DigSym6 which has <20.5m entries
+  // set this to avoid rehashing of the map
+  // load factor is 2/3, close to optimal ln(2)
+  const size_t SIZE = 1.5*20500000;
 
   // do not reparse previously seen lines
   // hit rates become close to 100%
   // protect if multithreaded
-  static std::unordered_map<void *, struct pnldata> map;
+  static std::unordered_map<void *, struct pnldata> map(SIZE);
 
   // scratch space
   static char *line = (char *)malloc(1024);
@@ -230,47 +236,48 @@ bool ParseNonterminalLine(const char *source, const unsigned int length,
   void * key = (void *)source;
   auto it = map.find(key);
   if (it == map.end()) {
-  // Tokenize the buffer using strtok
-  char *terminalptr;
-  char *tokstate;
+      // Tokenize the buffer using strtok
+      char *terminalptr;
+      char *tokstate;
 
-  // get writable copy of string
-  assert(length + 1 < 1024);
-  strncpy(line, source, length);
-  line[length] = 0;
+      // get writable copy of string
+      assert(length + 1 < 1024);
+      strncpy(line, source, length);
+      line[length] = 0;
 
-  terminalptr = strtok_r(line, "\t", &tokstate);
-  if (terminalptr == NULL) {
-    fprintf(stderr, "Terminal field not found!\n");
-    return false;
-  }
+      terminalptr = strtok_r(line, "\t", &tokstate);
+      if (terminalptr == NULL) {
+          fprintf(stderr, "Terminal field not found!\n");
+          return false;
+      }
 
-  char *probability_str;
-  probability_str = strtok_r(NULL, "\t", &tokstate);
-  if (probability_str == NULL) {
-    fprintf(stderr, "Probability field not found!\n");
-    return false;          
-  }
-  // Read in probability as a hex float and assign to out-parameter      
-  probability = strtod(probability_str, NULL);
-  // Check that probability is well-formed
-  if (probability <= 0.0 || probability > 1.0) {
-    fprintf(stderr, "Probability field not parsed correctly!\n");
-    return false;                
-  }
+      char *probability_str;
+      probability_str = strtok_r(NULL, "\t", &tokstate);
+      if (probability_str == NULL) {
+          fprintf(stderr, "Probability field not found!\n");
+          return false;
+      }
+      // Read in probability as a hex float and assign to out-parameter
+      probability = strtod(probability_str, NULL);
+      // Check that probability is well-formed
+      if (probability <= 0.0 || probability > 1.0) {
+          fprintf(stderr, "Probability field not parsed correctly!\n");
+          return false;
+      }
 
-  // The remainder of the line will be source ids
-  char *sourceidsptr;
-  sourceidsptr = strtok_r(NULL, "\n", &tokstate);
-  if (sourceidsptr == NULL) {
-    fprintf(stderr,
-      "Source IDs field not found!\n");
-    return false;          
-  }
+      // The remainder of the line will be source ids
+      char *sourceidsptr;
+      sourceidsptr = strtok_r(NULL, "\n", &tokstate);
+      if (sourceidsptr == NULL) {
+          fprintf(stderr,
+                  "Source IDs field not found!\n");
+          return false;
+      }
 
-  struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
-  map.insert({key, value});
-  it = map.find(key);
+      struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
+      auto foo = map.insert({key, value});
+      // insert returns pair<iterator, bool>
+      it = foo.first;
   }
 
   auto& data = it->second;

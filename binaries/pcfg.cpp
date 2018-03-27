@@ -98,6 +98,10 @@ bool PCFG::loadGrammar(
         continue;
       // LoadStructure will start a chain reaction that will initialize
       // nonterminals and terminals associated with this structure
+      // XXXstroucki this takes a very long time to run, like an hour.
+      // perhaps some optimizations could happen underneath here,
+      // with fewer calls to parseNonterminalLine, which go into the
+      // billions
       if (!structures_[structure_counter].loadStructure(
             read_structure,
             read_probability,
