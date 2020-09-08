@@ -23,6 +23,7 @@ sub new {
     pauseMode                => 0,
     mustRebuild              => 0,
     stableMode               => 1,
+    forceCores               => 0,
 
     # File / folder paths
     conditions => [],
@@ -54,6 +55,7 @@ sub print_usage {
     -k   don't delete the condition directory after building lookup table (warning: this might leave sensitive data on the machine)
     -p   pause for input from STDIN before starting parallel operations
     -n   specify number of cores for parallel lookup
+    -f   force the provided number of cores
     -b   random mode (random operations DO NOT use a set seed for deterministic results)
     -D   (for debugging only) don't delete any intermediate files produced while generating the lookup table
 
@@ -70,7 +72,7 @@ sub process_command_line {
   my $self = shift;
 
   my %opts;
-  getopts('hobkpDn:', \%opts);
+  getopts('hobkpDfn:', \%opts);
 
   # On -h just print usage and quit
   $self->print_usage() if defined $opts{h};
@@ -99,6 +101,7 @@ sub process_command_line {
     [qw/D deleteMode 0/],
     [qw/p pauseMode 1/],
     [qw/n coresSet 1/],
+    [qw/f forceCores 1/],
     [qw/k deleteConditionDirectory 0/],
     [qw/b stableMode 0/]
   );
@@ -180,11 +183,14 @@ sub set_cores {
   $self->{memsliceh} = $memslice / 1024 / 1024;
 
   # Adjust cores based on 2G process size (with 25% slack)
-  if (($self->{cores} * 2 * 1.25) > $self->{memh}) {
-    $self->{cores} = int($self->{memh} / 2 / 1.25);
-    print STDERR "Adjusting to use $self->{cores} cores\n";
+  if ($self->{forceCores}) {
+    print STDERR "Forcing use of $self->{cores} cores\n";
+  } else {
+    if (($self->{cores} * 2 * 1.25) > $self->{memh}) {
+      $self->{cores} = int($self->{memh} / 2 / 1.25);
+      print STDERR "Adjusting to use $self->{cores} cores\n";
+    }
   }
-
 } ## end sub set_cores
 
 1;

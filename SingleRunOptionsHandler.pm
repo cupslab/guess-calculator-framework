@@ -65,12 +65,12 @@ sub print_usage {
   there are also several optional arguments:
     -h   this help
     -v # set verbosity level 1(lowest) through 5  (currently not implemented)
-    -n # set the number of cores to utilize 
+    -n # set the number of cores to utilize
          (defaults to (available - 2), as reported by /proc/cpuinfo; or 1)
     -C # set probability threshold where # is of the form 1e-15 (defaults to 1e-12)
     -D   set sort directory (default is "sortdir" in the current directory)
     -R   set root name for calculation directory (default is "calculator")
-    -o   only create dictionary.zip (stage1), then stop    
+    -o   only create dictionary.zip (stage1), then stop
     -d   if specified the script will automatically delete files as it
          progresses through each experiment stage
     -g   include patterns for unseen terminals in the PCFG specification
@@ -161,14 +161,14 @@ sub set_cores {
         `cat /proc/meminfo | grep ^MemFree| grep -o \'[0-9]\\{1,\\}\'`
     );
     if (!$mem1 =~ /^\d+$/) {
-      die "odd, MemFree in /proc/meminfo is not a number: $mem1 \n";
+      print STDERR "odd, MemFree in /proc/meminfo is not a number: $mem1 \n";
     }
     chomp(
       my $mem2 =
         `cat /proc/meminfo | grep ^Cached| grep -o \'[0-9]\\{1,\\}\'`
     );
     if (!$mem2 =~ /^\d+$/) {
-      die "odd, Cached in /proc/meminfo is not a number: $mem2 \n";
+      print STDERR "odd, Cached in /proc/meminfo is not a number: $mem2 \n";
     }
     my $mem = $mem1 + $mem2;
     print STDERR "found "
@@ -179,7 +179,7 @@ sub set_cores {
       . $mem
       . "kb total\n";
     $mem -= $ramreserve;       #subtract out the ramdisk
-    if ($mem < 0) {
+    if ($mem <= 0) {
       $mem = 2000 * 1024;
     }
     print STDERR "using " . $mem . "kb of RAM after reserving some for system.";
