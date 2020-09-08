@@ -515,6 +515,7 @@ PlotGuessingCurves <- function(lookup.results,
     lookup.results <- subset(lookup.results,
                              guess.number <= guesscutoff)
   }
+  # join data
   guessing.data <- ComputeCumulativePercentages(lookup.results)
   guessing.data <- ComputeGuesswork(guessing.data)
   if (use.guesswork) {
@@ -633,6 +634,11 @@ PlotGuessingCurves <- function(lookup.results,
                                     levels = unique(as.character(cond.order)))
   
   # Make the graph!
+  if (kExtraFonts) {
+    fontfamily = "Helvetica Neue"
+  } else {
+    fontfamily = NULL
+  }
   xstring <- ifelse(use.guesswork, "guesswork", "guess.number")
   baseplot <- ggplot(guessing.data, 
                      aes_string(x = xstring, 
@@ -647,9 +653,7 @@ PlotGuessingCurves <- function(lookup.results,
           legend.title = element_blank(),
           legend.key = element_blank(),
           legend.position = ifelse(labelsoncurves | nolegend, "none", "right"),
-          text = safe.ifelse(kExtraFonts, 
-                             element_text(family = "Helvetica Neue"), 
-                             element_text()),
+          text = element_text(family = fontfamily),
           plot.margin =  
             unit(c(0.05, 
                    # Add margin to right side of plot for labels if labels on curves
