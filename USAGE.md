@@ -307,7 +307,7 @@ The six fields are:
 
 5. Pattern identifier
 
-  This string represents the *pattern* to which the password belongs.  A pattern is a bundle of guesses with the same probability and the same structure.  This field is used for debugging and is not required to use the guess calculator framework.
+  This string represents the *pattern* to which the password belongs.  A pattern is a bundle of guesses with the same probability and the same structure.  This field is used for debugging and is not required to use the guess calculator framework. Note that \x01 characters serve as structure break characters here.
 
 6. Guess number
  
