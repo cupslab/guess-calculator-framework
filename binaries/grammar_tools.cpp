@@ -1,5 +1,5 @@
 // grammar_tools.cpp - a collection of miscellaneous, low-level functions
-//   used when reading and parsing the grammar *on-disk* into higher-level 
+//   used when reading and parsing the grammar *on-disk* into higher-level
 //   objects
 //
 // Use of this source code is governed by the GPLv2 license that can be found
@@ -9,9 +9,9 @@
 // Author: Saranga Komanduri
 //   Based on code originally written and published by Matt Weir under the
 //   GPLv2 license.
-// 
+//
 // Modified: Fri May 30 18:35:30 2014
-// 
+//
 
 
 // Includes not covered in header file
@@ -72,8 +72,8 @@ int SkipStructuresHeader(FILE *fileptr) {
 
 // Read and parse a line from the structures file, checking for proper format.
 // On failure, output the offending line to stderr.
-bool ReadStructureLine(FILE *fileptr, 
-                       std::string& structure, 
+bool ReadStructureLine(FILE *fileptr,
+                       std::string& structure,
                        double& probability,
                        std::string& source_ids) {
   char buf[1024];
@@ -86,7 +86,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (structureptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       structure = structureptr;
     }
@@ -97,7 +97,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (probability_str == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Read in probability as a hex float and assign to out-parameter      
+      // Read in probability as a hex float and assign to out-parameter
       probability = strtod(probability_str, NULL);
 
       // Check that probability is well-formed
@@ -112,7 +112,7 @@ bool ReadStructureLine(FILE *fileptr,
     if (sourceidsptr == NULL) {
       goto error;  // strtok failed!
     } else {
-      // Copy the c-string to the out-parameter using the 
+      // Copy the c-string to the out-parameter using the
       // std::string assignment operator
       source_ids = sourceidsptr;
     }
@@ -125,7 +125,7 @@ bool ReadStructureLine(FILE *fileptr,
 
  error:
   fprintf(stderr, "Error in line: \"%s\" in structures file!\n", buf);
-  return false;    
+  return false;
 }
 
 // Simple function to remove the \x01 character from the input string and
@@ -142,7 +142,7 @@ std::string StripBreakCharacterFromTerminal(const std::string& inputstring) {
   return unbroken;
 }
 
-// Given a source pointer of size source_length, return 
+// Given a source pointer of size source_length, return
 // length of a line
 bool ReadLineFromCharArray2(const char *source,
                             unsigned int &size) {
@@ -157,7 +157,7 @@ bool ReadLineFromCharArray2(const char *source,
   size = length;
   return true;
 }
-  
+
 // Given a source pointer of size source_length, place one line from the
 // source into the destination and provide the number of bytes read.
 //
@@ -173,9 +173,9 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     bytes_to_read = source_length;
     end_of_string = true;
   }
-  
+
   // "Read" the characters by copying them into destination and check for errors
-  char *temp_position = 
+  char *temp_position =
     static_cast<char *> (memccpy(destination, source, '\n', bytes_to_read));
 
   // Allow that the source might not end in a newline only if we consume the
@@ -184,7 +184,7 @@ bool ReadLineFromCharArray(const char *source, size_t source_length,
     fprintf(stderr,
       "Newline character not found with read where source_length was %zu\n",
       source_length);
-    return false;    
+    return false;
   }
 
   // memccpy returns a pointer to just past the newline in destination unless
@@ -209,68 +209,78 @@ struct pnldata {
 
 // Read a line from a source buffer, taken from a nonterminal file, and parse
 // out the fields that are returned in the out-parameters.
-// 
+//
 // NOTE: This function uses strtok which destroys that source buffer.
-// 
+//
 // Return true on success, output the offending line to stderr on failure
 bool ParseNonterminalLine(const char *source, const unsigned int length,
-                          const char **terminal, 
+                          const char **terminal,
                           double& probability,
                           const char **source_ids) {
 
+  // most terminal rules have <12.8m entries
+  // except for DigSym6 which has <20.5m entries
+  // set this to avoid rehashing of the map
+  // load factor is 2/3, close to optimal ln(2)
+  const size_t SIZE = 1.5*20500000;
+
   // do not reparse previously seen lines
-  // hit rates become close to 100%
   // protect if multithreaded
-  static std::unordered_map<void *, struct pnldata> map;
+  static std::unordered_map<void *, struct pnldata> map(SIZE);
 
   // scratch space
   static char *line = (char *)malloc(1024);
   assert(line != 0);
 
   void * key = (void *)source;
+  // XXXstroucki safer to use string?
+  // std::string key(source, length);
   auto it = map.find(key);
   if (it == map.end()) {
-  // Tokenize the buffer using strtok
-  char *terminalptr;
-  char *tokstate;
+    // Tokenize the buffer using strtok
+    char *terminalptr;
+    char *tokstate;
 
-  // get writable copy of string
-  assert(length + 1 < 1024);
-  strncpy(line, source, length);
-  line[length] = 0;
+    // get writable copy of string
+    assert(length + 1 < 1024);
+    strncpy(line, source, length);
+    line[length] = 0;
 
-  terminalptr = strtok_r(line, "\t", &tokstate);
-  if (terminalptr == NULL) {
-    fprintf(stderr, "Terminal field not found!\n");
-    return false;
-  }
+    terminalptr = strtok_r(line, "\t", &tokstate);
+    if (terminalptr == NULL) {
+      fprintf(stderr, "Terminal field not found!\n");
+      return false;
+    }
 
-  char *probability_str;
-  probability_str = strtok_r(NULL, "\t", &tokstate);
-  if (probability_str == NULL) {
-    fprintf(stderr, "Probability field not found!\n");
-    return false;          
-  }
-  // Read in probability as a hex float and assign to out-parameter      
-  probability = strtod(probability_str, NULL);
-  // Check that probability is well-formed
-  if (probability <= 0.0 || probability > 1.0) {
-    fprintf(stderr, "Probability field not parsed correctly!\n");
-    return false;                
-  }
+    char *probability_str;
+    probability_str = strtok_r(NULL, "\t", &tokstate);
+    if (probability_str == NULL) {
+      fprintf(stderr, "Probability field not found!\n");
+      return false;
+    }
+    // Read in probability as a hex float and assign to out-parameter
+    probability = strtod(probability_str, NULL);
+    // Check that probability is well-formed
+    if (probability <= 0.0 || probability > 1.0) {
+      fprintf(stderr, "Probability field not parsed correctly!\n");
+      return false;
+    }
 
-  // The remainder of the line will be source ids
-  char *sourceidsptr;
-  sourceidsptr = strtok_r(NULL, "\n", &tokstate);
-  if (sourceidsptr == NULL) {
-    fprintf(stderr,
-      "Source IDs field not found!\n");
-    return false;          
-  }
+    // The remainder of the line will be source ids
+    char *sourceidsptr;
+    sourceidsptr = strtok_r(NULL, "\n", &tokstate);
+    if (sourceidsptr == NULL) {
+      fprintf(stderr,
+              "Source IDs field not found!\n");
+      return false;
+    }
 
-  struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
-  map.insert({key, value});
-  it = map.find(key);
+    // XXXXstroucki can internalize the sourceids by inserting in
+    // a set and getting the first of the iterator returned
+    struct pnldata value = {strdup(terminalptr), probability, strdup(sourceidsptr)};
+    auto foo = map.insert({key, value});
+    // insert returns pair<iterator, bool>
+    it = foo.first;
   }
 
   auto& data = it->second;
@@ -323,7 +333,7 @@ bool CountTerminalGroupsInText(const char *source, size_t source_length,
       fprintf(stderr,
         "Line could not be parsed with read starting at byte %ld!\n",
         current_position - source);
-      return false;          
+      return false;
     }
 
     // Check for a change in probability
@@ -394,7 +404,7 @@ bool IsEndOfTerminalGroup(const char *source, size_t source_length,
   double current_probability, next_probability;
   if (!ParseNonterminalLine(source, firstlength, &terminal,
                             current_probability, &source_ids)) {
-    return false;         
+    return false;
   }
   if (!ParseNonterminalLine(peek, peeklength, &terminal,
                             next_probability, &source_ids)) {

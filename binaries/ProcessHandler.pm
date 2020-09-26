@@ -101,7 +101,7 @@ sub aliveCount {
   my $reapcount = 0;
   my $count     = 0;
   # $lock->down;
-  while ((my $key, my $value) = each($self->{childAlive})) {
+  while ((my $key, my $value) = each(%{$self->{childAlive}})) {
     if ($value) {
       my $mypid = waitpid($key, &WNOHANG);
       if (($mypid == -1) || 
@@ -122,7 +122,7 @@ sub aliveCount {
 sub killAll {
   # Used to kill processes in case of exceeded max time or SIGINT
   my $self = shift;
-  while ((my $key, my $value) = each($self->{childAlive})) {
+  while ((my $key, my $value) = each(%{$self->{childAlive}})) {
     print STDERR "Killing process group $key with SIGTERM\n";
     kill -15, $key;
     waitpid($key, &WNOHANG);

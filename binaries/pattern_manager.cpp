@@ -153,7 +153,7 @@ bool PatternManager::intelligentSkipPatternCounter() {
 // Using the current state of the pattern counter, return the first string
 // of the pattern.  This is done by simply returning the first strings of
 // each of the terminal groups pointed to by the counter, and concatenating
-// them together.
+// them together (separated by a \x01 char).
 const std::string PatternManager::getFirstStringOfPattern() const {
   std::string result("");
   for (unsigned int i = 0; i < structure_size_; ++i) {
