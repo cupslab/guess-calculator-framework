@@ -203,30 +203,34 @@ uint64_t PCFG::countParses(const std::string& inputstring) const {
 // 3. highest parse_status code if not parseable
 //
 LookupData* PCFG::lookup(const std::string& inputstring) const {
-  LookupData *lookup_data = new LookupData;
+  LookupData *overall_lookup_data = new LookupData;
 
   // Pick a "low" initial value
-  lookup_data->parse_status = kStructureNotFound;
-  mpz_init(lookup_data->index);
-  bool canParse = false;  // Is the current best parseable?
+  overall_lookup_data->parse_status = kStructureNotFound;
+  // this initializes value to 0
+  mpz_init(overall_lookup_data->index);
+  overall_lookup_data->probability = -1;
+  bool overallCanParse = false;  // Is the current best parseable?
 
   for (unsigned int i = 0; i < structures_size_; ++i) {
     LookupData *structure_lookup = structures_[i].lookup(inputstring);
 
     // Implement three conditions that can make this structure better than the
     // current best structure.
-    if ( (!canParse && (structure_lookup->parse_status & kCanParse))  ||
-         (canParse &&
-          (structure_lookup->parse_status & kCanParse) &&
-          (lookup_data->probability < structure_lookup->probability)) ||
-         (!canParse &&
-          (static_cast<int>(lookup_data->parse_status) <
+    bool structureCanParse = structure_lookup->parse_status & kCanParse;
+    if ( (!overallCanParse && structureCanParse)  ||
+
+         (overallCanParse && structureCanParse &&
+          (overall_lookup_data->probability < structure_lookup->probability)) ||
+
+         (!overallCanParse &&
+          (static_cast<int>(overall_lookup_data->parse_status) <
            static_cast<int>(structure_lookup->parse_status))) ) {
       // Cleanup current best and make this structure the new best
-      mpz_clear(lookup_data->index);
-      delete lookup_data;
-      lookup_data = structure_lookup;
-      canParse = (lookup_data->parse_status & kCanParse);
+      mpz_clear(overall_lookup_data->index);
+      delete overall_lookup_data;
+      overall_lookup_data = structure_lookup;
+      overallCanParse = structureCanParse;
     } else {
       // Clear up this structure's lookup data and don't update current data
       mpz_clear(structure_lookup->index);
@@ -234,7 +238,7 @@ LookupData* PCFG::lookup(const std::string& inputstring) const {
     }
   }
 
-  return lookup_data;
+  return overall_lookup_data;
 }
 
 
@@ -246,12 +250,14 @@ LookupData* PCFG::lookup(const std::string& inputstring) const {
 // The general structure of this function is very similar to lookup().
 //
 LookupData* PCFG::lookupSum(const std::string& inputstring) const {
-  LookupData *lookup_data = new LookupData;
+  LookupData *overall_lookup_data = new LookupData;
 
   // Pick a "low" initial value
-  lookup_data->parse_status = kStructureNotFound;
-  mpz_init(lookup_data->index);
-  bool canParse = false;  // Is the current best parseable?
+  overall_lookup_data->parse_status = kStructureNotFound;
+  // this initializes value to 0
+  mpz_init(overall_lookup_data->index);
+  overall_lookup_data->probability = -1;
+  bool overallCanParse = false;  // Is the current best parseable?
 
   // Store the accumulated probability -- we want the returned structure
   // to have the highest probability among all structures, but return
@@ -271,17 +277,19 @@ LookupData* PCFG::lookupSum(const std::string& inputstring) const {
 
     // Implement three conditions that can make this structure better than the
     // current best structure.
-    if ( (!canParse && (structure_lookup->parse_status & kCanParse))  ||
-         (canParse &&
-          (structure_lookup->parse_status & kCanParse) &&
-          (lookup_data->probability < structure_lookup->probability)) ||
-         (!canParse &&
-          (static_cast<int>(lookup_data->parse_status) <
+    bool structureCanParse = structure_lookup->parse_status & kCanParse;
+    if ( (!overallCanParse && structureCanParse)  ||
+
+         (overallCanParse && structureCanParse &&
+          (overall_lookup_data->probability < structure_lookup->probability)) ||
+
+         (!overallCanParse &&
+          (static_cast<int>(overall_lookup_data->parse_status) <
            static_cast<int>(structure_lookup->parse_status))) ) {
-      mpz_clear(lookup_data->index);
-      delete lookup_data;
-      lookup_data = structure_lookup;
-      canParse = (lookup_data->parse_status & kCanParse);
+      mpz_clear(overall_lookup_data->index);
+      delete overall_lookup_data;
+      overall_lookup_data = structure_lookup;
+      overallCanParse = structureCanParse;
     } else {
       // Clear up this structure's lookup data and don't update current data
       mpz_clear(structure_lookup->index);
@@ -290,7 +298,7 @@ LookupData* PCFG::lookupSum(const std::string& inputstring) const {
   }
 
   // Before returning, fix the probability value
-  lookup_data->probability = total_probability;
-  return lookup_data;
+  overall_lookup_data->probability = total_probability;
+  return overall_lookup_data;
 }
 
